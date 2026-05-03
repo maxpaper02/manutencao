@@ -1,4 +1,4 @@
-import { mysqlTable, int, varchar, text, timestamp, datetime, mysqlEnum } from "drizzle-orm/mysql-core";
+import { mysqlTable, int, varchar, text, timestamp, date, mysqlEnum } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -40,7 +40,7 @@ export const serviceOrders = mysqlTable("serviceOrders", {
   assignedTo: int("assignedTo"), // ID do usuário responsável (FK para users)
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-  dueDate: datetime("dueDate"),
+  dueDate: date("dueDate"),
 });
 
 export type ServiceOrder = typeof serviceOrders.$inferSelect;

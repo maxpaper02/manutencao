@@ -503,12 +503,12 @@ setDueDate("");
 </td>
 
 <td className="px-6 py-4 text-sm text-white">
-  {new Date(selectedOrder.dueDate + "T00:00:00").toLocaleDateString("pt-BR")}
+  {new Date(selectedOrder?.dueDate + "T00:00:00").toLocaleDateString("pt-BR")}
 </td>
 
 <td className="px-6 py-4 text-sm text-white">
   {order.dueDate
-  ? new Date(selectedOrder.dueDate + "T00:00:00").toLocaleDateString("pt-BR")
+  ? new Date(selectedOrder?.dueDate + "T00:00:00").toLocaleDateString("pt-BR")
   : "Sem prazo"}
 </td>
 
@@ -616,7 +616,7 @@ setDueDate("");
                     </Badge>
 
                     <span className="text-xs text-slate-400">
-                      {new Date(selectedOrder.dueDate + "T00:00:00").toLocaleDateString("pt-BR")}
+                      {new Date(selectedOrder?.dueDate + "T00:00:00").toLocaleDateString("pt-BR")}
                     </span>
                   </div>
 
@@ -625,7 +625,7 @@ setDueDate("");
 </td>
 
 <td className="px-6 py-4 text-sm text-white">
-  {new Date(selectedOrder.dueDate + "T00:00:00").toLocaleDateString("pt-BR")}
+  {new Date(selectedOrder?.dueDate + "T00:00:00").toLocaleDateString("pt-BR")}
 </td>
 
 <td className="px-6 py-4 text-sm text-white">
