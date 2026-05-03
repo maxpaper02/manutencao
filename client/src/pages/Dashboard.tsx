@@ -96,8 +96,8 @@ export default function Dashboard() {
       setShowStatusDialog(false);
       setSelectedOrder(null);
       setNewStatus("");
-setNotes("");
-setDueDate("");
+      setNotes("");
+      setDueDate("");
       refetch();
     },
     onError: (error: any) => {
@@ -149,6 +149,24 @@ setDueDate("");
     return orders;
   }, [orders]);
 
+  const formatDateOnly = (value: string | Date | null | undefined) => {
+    if (!value) return "Sem prazo";
+
+    const date = value instanceof Date ? value : new Date(value);
+    if (Number.isNaN(date.getTime())) return "Sem prazo";
+
+    return date.toLocaleDateString("pt-BR");
+  };
+
+  const formatCreatedAt = (value: string | Date | null | undefined) => {
+    if (!value) return "-";
+
+    const date = value instanceof Date ? value : new Date(value);
+    if (Number.isNaN(date.getTime())) return "-";
+
+    return date.toLocaleDateString("pt-BR");
+  };
+
   const handleUpdateStatus = () => {
     if (!selectedOrder || !newStatus) {
       toast.error("Selecione um novo status");
@@ -156,11 +174,11 @@ setDueDate("");
     }
 
     updateStatusMutation.mutate({
-  orderId: selectedOrder.id,
-  newStatus,
-  notes: notes || undefined,
-  dueDate: dueDate || undefined,
-});
+      orderId: selectedOrder.id,
+      newStatus,
+      notes: notes || undefined,
+      dueDate: dueDate || undefined,
+    });
   };
 
   const handleDeleteOrder = (orderId: number) => {
@@ -222,7 +240,6 @@ setDueDate("");
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#4f8f4d] via-[#B4EDA6] to-[#D7FFCD]">
-      {/* Header */}
       <header className="border-b border-slate-700/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div>
@@ -261,9 +278,7 @@ setDueDate("");
         </div>
       </header>
 
-      {/* Main */}
       <main className="container max-w-7xl mx-auto px-4 py-8">
-        {/* Filters */}
         <Card className="bg-gradient-to-br from-[#1A3B2D] to-[#347055] border-slate-600 text-white overflow-hidden p-8 backdrop-blur-sm">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="relative">
@@ -373,7 +388,6 @@ setDueDate("");
           </div>
         </Card>
 
-        {/* Actions */}
         <div className="flex justify-end mt-4 mb-4">
           <Button
             variant="outline"
@@ -388,7 +402,6 @@ setDueDate("");
           </Button>
         </div>
 
-        {/* Desktop Table */}
         <div className="hidden md:block">
           <Card className="bg-gradient-to-br from-[#1A3B2D] to-[#347055] border-slate-600 text-white overflow-hidden backdrop-blur-sm">
             {ordersLoading ? (
@@ -434,14 +447,14 @@ setDueDate("");
                         Solicitante
                       </th>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-white">
-  Data
-</th>
-<th className="px-6 py-4 text-left text-sm font-semibold text-white">
-  Prazo
-</th>
-<th className="px-6 py-4 text-left text-sm font-semibold text-white">
-  Ações
-</th>
+                        Data
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-white">
+                        Prazo
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-white">
+                        Ações
+                      </th>
                     </tr>
                   </thead>
 
@@ -499,63 +512,58 @@ setDueDate("");
                           </Badge>
                         </td>
                         <td className="px-6 py-4 text-sm text-slate-300">
-  {order.requesterName}
-</td>
+                          {order.requesterName}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-white">
+                          {formatCreatedAt(order.createdAt)}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-white">
+                          {formatDateOnly(order.dueDate)}
+                        </td>
+                        <td className="px-6 py-4 text-sm">
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-[#D5FFCD] hover:bg-[#347055]"
+                              onClick={() => {
+                                setSelectedOrder(order);
+                                setNewStatus(order.status as OrderStatus);
+                                setNotes("");
+                                setDueDate(
+                                  order?.dueDate
+                                    ? new Date(order.dueDate).toISOString().slice(0, 10)
+                                    : ""
+                                );
+                                setShowStatusDialog(true);
+                              }}
+                            >
+                              Atualizar
+                            </Button>
 
-<td className="px-6 py-4 text-sm text-white">
-  {new Date(selectedOrder?.dueDate + "T00:00:00").toLocaleDateString("pt-BR")}
-</td>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-[#D5FFCD] hover:bg-[#347055]"
+                              onClick={() => {
+                                setSelectedOrder(order);
+                                setShowHistoryDialog(true);
+                              }}
+                            >
+                              Histórico
+                            </Button>
 
-<td className="px-6 py-4 text-sm text-white">
-  {order.dueDate
-  ? new Date(selectedOrder?.dueDate + "T00:00:00").toLocaleDateString("pt-BR")
-  : "Sem prazo"}
-</td>
-
-<td className="px-6 py-4 text-sm">
-  <div className="flex gap-2">
-    <Button
-      size="sm"
-      variant="ghost"
-      className="text-[#D5FFCD] hover:bg-[#347055]"
-      onClick={() => {
-        setSelectedOrder(order);
-        setNewStatus(order.status as OrderStatus);
-        setNotes("");
-        setDueDate(
-          order.dueDate
-            ? new Date(order.dueDate).toISOString().slice(0, 16)
-            : ""
-        );
-        setShowStatusDialog(true);
-      }}
-    >
-      Atualizar
-    </Button>
-
-    <Button
-      size="sm"
-      variant="ghost"
-      className="text-[#D5FFCD] hover:bg-[#347055]"
-      onClick={() => {
-        setSelectedOrder(order);
-        setShowHistoryDialog(true);
-      }}
-    >
-      Histórico
-    </Button>
-
-    <Button
-      size="sm"
-      variant="ghost"
-      className="text-[#F28D95] hover:bg-[#F21D2F]/10 hover:text-[#F21D2F]"
-      onClick={() => handleDeleteOrder(order.id)}
-      disabled={deleteOrderMutation.isPending}
-    >
-      Excluir
-    </Button>
-  </div>
-</td>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-[#F28D95] hover:bg-[#F21D2F]/10 hover:text-[#F21D2F]"
+                              onClick={() => handleDeleteOrder(order.id)}
+                              disabled={deleteOrderMutation.isPending}
+                            >
+                              Excluir
+                            </Button>
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -565,7 +573,6 @@ setDueDate("");
           </Card>
         </div>
 
-        {/* Mobile */}
         <div className="md:hidden space-y-4">
           {ordersLoading ? (
             <div className="flex items-center justify-center py-12">
@@ -616,68 +623,60 @@ setDueDate("");
                     </Badge>
 
                     <span className="text-xs text-slate-400">
-                      {new Date(selectedOrder?.dueDate + "T00:00:00").toLocaleDateString("pt-BR")}
+                      {formatCreatedAt(order.createdAt)}
                     </span>
                   </div>
 
-                  <td className="px-6 py-4 text-sm text-slate-300">
-  {order.requesterName}
-</td>
+                  <p className="text-xs text-slate-400">
+                    Solicitante: {order.requesterName}
+                  </p>
 
-<td className="px-6 py-4 text-sm text-white">
-  {new Date(selectedOrder?.dueDate + "T00:00:00").toLocaleDateString("pt-BR")}
-</td>
+                  <p className="text-xs text-slate-400">
+                    Prazo: {formatDateOnly(order.dueDate)}
+                  </p>
 
-<td className="px-6 py-4 text-sm text-white">
-  {order?.dueDate
-  ? new Date(order.dueDate + "T00:00:00").toLocaleDateString("pt-BR")
-  : "Sem prazo"}
-</td>
+                  <div className="flex gap-2 pt-2">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="flex-1 text-[#D5FFCD] hover:bg-[#347055] text-xs h-8"
+                      onClick={() => {
+                        setSelectedOrder(order);
+                        setNewStatus(order.status as OrderStatus);
+                        setNotes("");
+                        setDueDate(
+                          order?.dueDate
+                            ? new Date(order.dueDate).toISOString().slice(0, 10)
+                            : ""
+                        );
+                        setShowStatusDialog(true);
+                      }}
+                    >
+                      Atualizar
+                    </Button>
 
-<td className="px-6 py-4 text-sm">
-  <div className="flex gap-2">
-    <Button
-      size="sm"
-      variant="ghost"
-      className="text-[#D5FFCD] hover:bg-[#347055]"
-      onClick={() => {
-        setSelectedOrder(order);
-        setNewStatus(order.status as OrderStatus);
-        setNotes("");
-        setDueDate(
-  order.dueDate
-    ? new Date(selectedOrder + "T00:00:00").toLocaleDateString("pt-BR")
-    : ""
-);
-        setShowStatusDialog(true);
-      }}
-    >
-      Atualizar
-    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="flex-1 text-slate-300 hover:bg-slate-700/50 text-xs h-8"
+                      onClick={() => {
+                        setSelectedOrder(order);
+                        setShowHistoryDialog(true);
+                      }}
+                    >
+                      Histórico
+                    </Button>
 
-    <Button
-      size="sm"
-      variant="ghost"
-      className="text-[#D5FFCD] hover:bg-[#347055]"
-      onClick={() => {
-        setSelectedOrder(order);
-        setShowHistoryDialog(true);
-      }}
-    >
-      Histórico
-    </Button>
-
-    <Button
-      size="sm"
-      variant="ghost"
-      className="text-[#F28D95] hover:bg-[#F21D2F]/10 hover:text-[#F21D2F]"
-      onClick={() => handleDeleteOrder(order.id)}
-      disabled={deleteOrderMutation.isPending}
-    >
-      Excluir
-    </Button>
-  </div>
-</td>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="flex-1 text-[#F28D95] hover:bg-[#F21D2F]/10 hover:text-[#F21D2F] text-xs h-8"
+                      onClick={() => handleDeleteOrder(order.id)}
+                      disabled={deleteOrderMutation.isPending}
+                    >
+                      Excluir
+                    </Button>
+                  </div>
                 </div>
               </Card>
             ))
@@ -686,288 +685,291 @@ setDueDate("");
       </main>
 
       {/* Modal Atualizar Status */}
-<Dialog open={showStatusDialog} onOpenChange={setShowStatusDialog}>
-  <DialogContent className="bg-[#1F4D3A] border border-[#A9C9A0] shadow-2xl shadow-[#0D0D0D]/25">
-    <DialogHeader>
-      <DialogTitle className="text-[#FFFFFF]">
-        Status -{" "}
-        {selectedOrder?.sector ||
-          selectedOrder?.sectorMachine ||
-          "Sem identificação"}
-      </DialogTitle>
-    </DialogHeader>
+      <Dialog open={showStatusDialog} onOpenChange={setShowStatusDialog}>
+        <DialogContent className="bg-[#1F4D3A] border border-[#A9C9A0] shadow-2xl shadow-[#0D0D0D]/25">
+          <DialogHeader>
+            <DialogTitle className="text-[#FFFFFF]">
+              Status -{" "}
+              {selectedOrder?.sector ||
+                selectedOrder?.sectorMachine ||
+                "Sem identificação"}
+            </DialogTitle>
+          </DialogHeader>
 
-    <div className="space-y-4">
-      {/* Resumo da solicitação */}
-<div className="bg-[#2F5D50] border border-[#A9C9A0]/40 rounded-lg p-4 space-y-3">
-  <h3 className="text-sm font-bold text-[#D7FFCD] uppercase tracking-wide">
-    Solicitação
-  </h3>
+          <div className="space-y-4">
+            <div className="bg-[#2F5D50] border border-[#A9C9A0]/40 rounded-lg p-4 space-y-3">
+              <h3 className="text-sm font-bold text-[#D7FFCD] uppercase tracking-wide">
+                Solicitação
+              </h3>
 
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-    <div>
-      <span className="font-semibold text-[#D7E8D1]">Setor / Máquina:</span>
-      <p className="text-white">
-        {selectedOrder?.sector || "Não informado"}
-      </p>
-    </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                <div>
+                  <span className="font-semibold text-[#D7E8D1]">Setor / Máquina:</span>
+                  <p className="text-white">
+                    {selectedOrder?.sector || "Não informado"}
+                  </p>
+                </div>
 
-    <div>
-      <span className="font-semibold text-[#D7E8D1]">Tipo de problema:</span>
-      <p className="text-white">
-        {selectedOrder?.problemType || "Não informado"}
-      </p>
-    </div>
+                <div>
+                  <span className="font-semibold text-[#D7E8D1]">Tipo de problema:</span>
+                  <p className="text-white">
+                    {selectedOrder?.problemType || "Não informado"}
+                  </p>
+                </div>
 
-    <div>
-      <span className="font-semibold text-[#D7E8D1]">Prioridade:</span>
-      <p className="text-white">
-        {selectedOrder?.priority || "Não informado"}
-      </p>
-    </div>
+                <div>
+                  <span className="font-semibold text-[#D7E8D1]">Prioridade:</span>
+                  <p className="text-white">
+                    {selectedOrder?.priority || "Não informado"}
+                  </p>
+                </div>
 
-    <div>
-      <span className="font-semibold text-[#D7E8D1]">Solicitante:</span>
-      <p className="text-white">
-        {selectedOrder?.requesterName || "Não informado"}
-      </p>
-    </div>
-<div>
-  <span className="font-semibold text-[#D7E8D1]">Prazo de conclusão:</span>
-  <p className="text-white">
-    {selectedOrder?.dueDate
-      ? new Date(selectedOrder + "T00:00:00").toLocaleDateString("pt-BR")
-      : "Sem prazo"}
-  </p>
-</div>
-    <div className="md:col-span-2">
-      <span className="font-semibold text-[#D7E8D1]">Data de abertura:</span>
-      <p className="text-white">
-        {selectedOrder?.createdAt
-          ? new Date(selectedOrder + "T00:00:00").toLocaleDateString("pt-BR")
-          : "Não informado"}
-      </p>
-    </div>
+                <div>
+                  <span className="font-semibold text-[#D7E8D1]">Solicitante:</span>
+                  <p className="text-white">
+                    {selectedOrder?.requesterName || "Não informado"}
+                  </p>
+                </div>
 
-    <div className="md:col-span-2">
-      <span className="font-semibold text-[#D7E8D1]">Descrição detalhada:</span>
-      <p className="text-white whitespace-pre-wrap break-words">
-        {selectedOrder?.description || "Não informado"}
-      </p>
-    </div>
-  </div>
-</div>
-      <div>
-        <label className="block text-sm font-semibold text-white mb-2">
-          Status Atual:{" "}
-          <span className="text-[#D7FFCD]">{selectedOrder?.status}</span>
-        </label>
-      </div>
+                <div>
+                  <span className="font-semibold text-[#D7E8D1]">Data de abertura:</span>
+                  <p className="text-white">
+                    {formatCreatedAt(selectedOrder?.createdAt)}
+                  </p>
+                </div>
 
-      <div>
-        <label className="block text-sm font-semibold text-white mb-2">
-          Novo Status *
-        </label>
-        <div>
-  <label className="block text-sm font-semibold text-white mb-2">
-    Prazo de conclusão
-  </label>
-  <Input
-    type="date"
-    value={dueDate}
-    onChange={(e) => setDueDate(e.target.value)}
-    className="bg-[#F4F7F2] border-[#A9C9A0] text-[#0D0D0D] focus-visible:ring-[#66A663] focus-visible:border-[#66A663]"
-  />
-</div>
+                <div>
+                  <span className="font-semibold text-[#D7E8D1]">Prazo de conclusão:</span>
+                  <p className="text-white">
+                    {formatDateOnly(selectedOrder?.dueDate)}
+                  </p>
+                </div>
 
-        <Select
-          value={newStatus}
-          onValueChange={(value) => setNewStatus(value as OrderStatus)}
-        >
-          <SelectTrigger className="w-[180px] bg-[#F4F7F2] border-[#A9C9A0] text-[#2F5D50] hover:bg-[#EAF3E4]">
-            <SelectValue placeholder="Selecione o status" />
-          </SelectTrigger>
-
-          <SelectContent className="bg-white border border-[#A9C9A0] text-[#0D0D0D]">
-            <SelectItem
-              value="Aberta"
-              className="text-[#0D0D0D] data-[highlighted]:bg-[#2F5D50] data-[highlighted]:text-white"
-            >
-              Aberta
-            </SelectItem>
-            <SelectItem
-              value="Em Andamento"
-              className="text-[#0D0D0D] data-[highlighted]:bg-[#2F5D50] data-[highlighted]:text-white"
-            >
-              Em Andamento
-            </SelectItem>
-            <SelectItem
-              value="Concluída"
-              className="text-[#0D0D0D] data-[highlighted]:bg-[#2F5D50] data-[highlighted]:text-white"
-            >
-              Concluída
-            </SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div>
-        <label className="block text-sm font-semibold text-white mb-2">
-          Notas (opcional)
-        </label>
-        <Textarea
-          placeholder="Adicione notas sobre esta alteração..."
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          rows={3}
-          className="bg-[#F4F7F2] border-[#A9C9A0] text-[#0D0D0D] placeholder:text-[#5B665F] focus-visible:ring-[#66A663] focus-visible:border-[#66A663] resize-none"
-        />
-      </div>
-    </div>
-
-    <DialogFooter>
-      <Button
-        variant="outline"
-        className="border-[#A9C9A0] text-[#2F5D50] bg-[#F4F7F2] hover:bg-[#DCEAD5]"
-        onClick={() => setShowStatusDialog(false)}
-      >
-        Cancelar
-      </Button>
-
-      <Button
-        className="bg-[#2F5D50] hover:bg-[#264A40] text-white border-0"
-        onClick={handleUpdateStatus}
-        disabled={updateStatusMutation.isPending}
-      >
-        {updateStatusMutation.isPending ? (
-          <>
-            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            Atualizando...
-          </>
-        ) : (
-          "Atualizar Status"
-        )}
-      </Button>
-    </DialogFooter>
-  </DialogContent>
-</Dialog>
-
-      {/* Modal Histórico */}
-<Dialog open={showHistoryDialog} onOpenChange={setShowHistoryDialog}>
-  <DialogContent className="bg-[#1F4D3A] border border-[#A9C9A0] shadow-2xl shadow-[#0D0D0D]/25 max-w-2xl">
-    <DialogHeader>
-      <DialogTitle className="text-[#FFFFFF]">
-        Status -{" "}
-        {selectedOrder?.sector ||
-          selectedOrder?.sectorMachine ||
-          "Sem identificação"}
-      </DialogTitle>
-    </DialogHeader>
-
-    <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
-      {/* Resumo da solicitação */}
-      <div className="bg-[#2F5D50] border border-[#A9C9A0]/40 rounded-lg p-4 space-y-3">
-        <h3 className="text-sm font-bold text-[#D7FFCD] uppercase tracking-wide">
-          Solicitação
-        </h3>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-          <div>
-            <span className="font-semibold text-[#D7E8D1]">Setor / Máquina:</span>
-            <p className="text-white">
-              {selectedOrder?.sector || "Não informado"}
-            </p>
-          </div>
-
-          <div>
-            <span className="font-semibold text-[#D7E8D1]">Tipo de problema:</span>
-            <p className="text-white">
-              {selectedOrder?.problemType || "Não informado"}
-            </p>
-          </div>
-
-          <div>
-            <span className="font-semibold text-[#D7E8D1]">Prioridade:</span>
-            <p className="text-white">
-              {selectedOrder?.priority || "Não informado"}
-            </p>
-          </div>
-
-          <div>
-            <span className="font-semibold text-[#D7E8D1]">Solicitante:</span>
-            <p className="text-white">
-              {selectedOrder?.requesterName || "Não informado"}
-            </p>
-          </div>
-
-          <div className="md:col-span-2">
-            <span className="font-semibold text-[#D7E8D1]">Data de abertura:</span>
-            <p className="text-white">
-              {selectedOrder?.createdAt
-                ? new Date(selectedOrder + "T00:00:00").toLocaleDateString("pt-BR")
-                : "Não informado"}
-            </p>
-          </div>
-
-          <div className="md:col-span-2">
-            <span className="font-semibold text-[#D7E8D1]">Descrição detalhada:</span>
-            <p className="text-white whitespace-pre-wrap break-words">
-              {selectedOrder?.description || "Não informado"}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {historyLoading ? (
-        <div className="flex items-center justify-center py-8">
-          <Loader2 className="w-5 h-5 text-[#D7FFCD] animate-spin" />
-        </div>
-      ) : history.length === 0 ? (
-        <p className="text-[#D7E8D1] text-center py-8">
-          Nenhuma alteração registrada
-        </p>
-      ) : (
-        history.map((entry: any, idx: number) => (
-          <div
-            key={idx}
-            className="bg-[#2F5D50] border border-[#A9C9A0]/40 rounded-lg p-4"
-          >
-            <div className="flex items-center justify-between mb-2 gap-3">
-              <div className="flex items-center gap-2">
-                <Badge
-                  variant="outline"
-                  className="bg-[#F4F7F2] text-[#2F5D50] border-[#A9C9A0]"
-                >
-                  {entry.previousStatus || "Inicial"} → {entry.newStatus}
-                </Badge>
+                <div className="md:col-span-2">
+                  <span className="font-semibold text-[#D7E8D1]">Descrição detalhada:</span>
+                  <p className="text-white whitespace-pre-wrap break-words">
+                    {selectedOrder?.description || "Não informado"}
+                  </p>
+                </div>
               </div>
-
-              <span className="text-xs text-[#D7E8D1] whitespace-nowrap">
-                {new Date(selectedOrder + "T00:00:00").toLocaleDateString("pt-BR")}
-              </span>
             </div>
 
-            {entry.notes && (
-              <p className="text-sm text-[#FFFFFF] mt-2">
-                <span className="font-semibold text-[#D7FFCD]">Notas:</span>{" "}
-                {entry.notes}
+            <div>
+              <label className="block text-sm font-semibold text-white mb-2">
+                Status Atual:{" "}
+                <span className="text-[#D7FFCD]">{selectedOrder?.status}</span>
+              </label>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-white mb-2">
+                Novo Status *
+              </label>
+
+              <Select
+                value={newStatus}
+                onValueChange={(value) => setNewStatus(value as OrderStatus)}
+              >
+                <SelectTrigger className="w-[180px] bg-[#F4F7F2] border-[#A9C9A0] text-[#2F5D50] hover:bg-[#EAF3E4]">
+                  <SelectValue placeholder="Selecione o status" />
+                </SelectTrigger>
+
+                <SelectContent className="bg-white border border-[#A9C9A0] text-[#0D0D0D]">
+                  <SelectItem
+                    value="Aberta"
+                    className="text-[#0D0D0D] data-[highlighted]:bg-[#2F5D50] data-[highlighted]:text-white"
+                  >
+                    Aberta
+                  </SelectItem>
+                  <SelectItem
+                    value="Em Andamento"
+                    className="text-[#0D0D0D] data-[highlighted]:bg-[#2F5D50] data-[highlighted]:text-white"
+                  >
+                    Em Andamento
+                  </SelectItem>
+                  <SelectItem
+                    value="Concluída"
+                    className="text-[#0D0D0D] data-[highlighted]:bg-[#2F5D50] data-[highlighted]:text-white"
+                  >
+                    Concluída
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-white mb-2">
+                Prazo de conclusão
+              </label>
+              <Input
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                className="bg-[#F4F7F2] border-[#A9C9A0] text-[#0D0D0D] focus-visible:ring-[#66A663] focus-visible:border-[#66A663]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-white mb-2">
+                Notas (opcional)
+              </label>
+              <Textarea
+                placeholder="Adicione notas sobre esta alteração..."
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                rows={3}
+                className="bg-[#F4F7F2] border-[#A9C9A0] text-[#0D0D0D] placeholder:text-[#5B665F] focus-visible:ring-[#66A663] focus-visible:border-[#66A663] resize-none"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              className="border-[#A9C9A0] text-[#2F5D50] bg-[#F4F7F2] hover:bg-[#DCEAD5]"
+              onClick={() => setShowStatusDialog(false)}
+            >
+              Cancelar
+            </Button>
+
+            <Button
+              className="bg-[#2F5D50] hover:bg-[#264A40] text-white border-0"
+              onClick={handleUpdateStatus}
+              disabled={updateStatusMutation.isPending}
+            >
+              {updateStatusMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Atualizando...
+                </>
+              ) : (
+                "Atualizar Status"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal Histórico */}
+      <Dialog open={showHistoryDialog} onOpenChange={setShowHistoryDialog}>
+        <DialogContent className="bg-[#1F4D3A] border border-[#A9C9A0] shadow-2xl shadow-[#0D0D0D]/25 max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-[#FFFFFF]">
+              Histórico -{" "}
+              {selectedOrder?.sector ||
+                selectedOrder?.sectorMachine ||
+                "Sem identificação"}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
+            <div className="bg-[#2F5D50] border border-[#A9C9A0]/40 rounded-lg p-4 space-y-3">
+              <h3 className="text-sm font-bold text-[#D7FFCD] uppercase tracking-wide">
+                Solicitação
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                <div>
+                  <span className="font-semibold text-[#D7E8D1]">Setor / Máquina:</span>
+                  <p className="text-white">
+                    {selectedOrder?.sector || "Não informado"}
+                  </p>
+                </div>
+
+                <div>
+                  <span className="font-semibold text-[#D7E8D1]">Tipo de problema:</span>
+                  <p className="text-white">
+                    {selectedOrder?.problemType || "Não informado"}
+                  </p>
+                </div>
+
+                <div>
+                  <span className="font-semibold text-[#D7E8D1]">Prioridade:</span>
+                  <p className="text-white">
+                    {selectedOrder?.priority || "Não informado"}
+                  </p>
+                </div>
+
+                <div>
+                  <span className="font-semibold text-[#D7E8D1]">Solicitante:</span>
+                  <p className="text-white">
+                    {selectedOrder?.requesterName || "Não informado"}
+                  </p>
+                </div>
+
+                <div>
+                  <span className="font-semibold text-[#D7E8D1]">Data de abertura:</span>
+                  <p className="text-white">
+                    {formatCreatedAt(selectedOrder?.createdAt)}
+                  </p>
+                </div>
+
+                <div>
+                  <span className="font-semibold text-[#D7E8D1]">Prazo de conclusão:</span>
+                  <p className="text-white">
+                    {formatDateOnly(selectedOrder?.dueDate)}
+                  </p>
+                </div>
+
+                <div className="md:col-span-2">
+                  <span className="font-semibold text-[#D7E8D1]">Descrição detalhada:</span>
+                  <p className="text-white whitespace-pre-wrap break-words">
+                    {selectedOrder?.description || "Não informado"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {historyLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-5 h-5 text-[#D7FFCD] animate-spin" />
+              </div>
+            ) : history.length === 0 ? (
+              <p className="text-[#D7E8D1] text-center py-8">
+                Nenhuma alteração registrada
               </p>
+            ) : (
+              history.map((entry: any, idx: number) => (
+                <div
+                  key={idx}
+                  className="bg-[#2F5D50] border border-[#A9C9A0]/40 rounded-lg p-4"
+                >
+                  <div className="flex items-center justify-between mb-2 gap-3">
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant="outline"
+                        className="bg-[#F4F7F2] text-[#2F5D50] border-[#A9C9A0]"
+                      >
+                        {entry.previousStatus || "Inicial"} → {entry.newStatus}
+                      </Badge>
+                    </div>
+
+                    <span className="text-xs text-[#D7E8D1] whitespace-nowrap">
+                      {new Date(entry.changedAt).toLocaleString("pt-BR")}
+                    </span>
+                  </div>
+
+                  {entry.notes && (
+                    <p className="text-sm text-[#FFFFFF] mt-2">
+                      <span className="font-semibold text-[#D7FFCD]">Notas:</span>{" "}
+                      {entry.notes}
+                    </p>
+                  )}
+                </div>
+              ))
             )}
           </div>
-        ))
-      )}
-    </div>
 
-    <DialogFooter>
-      <Button
-        className="bg-[#F4F7F2] hover:bg-[#DCEAD5] text-[#2F5D50] border border-[#A9C9A0]"
-        onClick={() => setShowHistoryDialog(false)}
-      >
-        Fechar
-      </Button>
-    </DialogFooter>
-  </DialogContent>
-</Dialog>
+          <DialogFooter>
+            <Button
+              className="bg-[#F4F7F2] hover:bg-[#DCEAD5] text-[#2F5D50] border border-[#A9C9A0]"
+              onClick={() => setShowHistoryDialog(false)}
+            >
+              Fechar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
