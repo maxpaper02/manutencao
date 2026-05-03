@@ -40,15 +40,32 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ input, ctx }) => {
-        const validUser = input.username === process.env.ADMIN_USER;
-        const validPass = input.password === process.env.ADMIN_PASS;
+        const users = [
+  {
+    username: process.env.ADMIN_USER,
+    password: process.env.ADMIN_PASS,
+  },
+  {
+    username: process.env.ADMIN_USER_2,
+    password: process.env.ADMIN_PASS_2,
+  },
+  {
+    username: process.env.ADMIN_USER_3,
+    password: process.env.ADMIN_PASS_3,
+  },
+].filter((user) => user.username && user.password);
 
-        if (!validUser || !validPass) {
-          throw new TRPCError({
-            code: "UNAUTHORIZED",
-            message: "Usuário ou senha inválidos",
-          });
-        }
+const matchedUser = users.find(
+  (user) =>
+    user.username === input.username && user.password === input.password
+);
+
+if (!matchedUser) {
+  throw new TRPCError({
+    code: "UNAUTHORIZED",
+    message: "Usuário ou senha inválidos",
+  });
+}
 
         ctx.res.cookie("admin_session", "authenticated", {
           httpOnly: true,
