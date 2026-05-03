@@ -175,7 +175,8 @@ export async function updateServiceOrderStatus(
   orderId: number,
   newStatus: string,
   changedBy?: number,
-  notes?: string
+  notes?: string,
+  dueDate?: string
 ) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -184,9 +185,12 @@ export async function updateServiceOrderStatus(
   if (!order) throw new Error("Order not found");
 
   await db
-    .update(serviceOrders)
-    .set({ status: newStatus as any })
-    .where(eq(serviceOrders.id, orderId));
+  .update(serviceOrders)
+  .set({
+    status: newStatus as any,
+    dueDate: dueDate ? new Date(dueDate) : null,
+  })
+  .where(eq(serviceOrders.id, orderId));
 
   await db.insert(statusHistory).values({
     orderId,

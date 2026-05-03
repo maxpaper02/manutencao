@@ -215,21 +215,23 @@ return {
       }),
 
     updateStatus: publicProcedure
-      .input(
-        z.object({
-          orderId: z.number(),
-          newStatus: z.enum(["Aberta", "Em Andamento", "Concluída"]),
-          notes: z.string().optional(),
-        })
-      )
+  .input(
+    z.object({
+      orderId: z.number(),
+      newStatus: z.enum(["Aberta", "Em Andamento", "Concluída"]),
+      notes: z.string().optional(),
+      dueDate: z.string().optional(),
+    })
+  )
       .mutation(async ({ input, ctx }) => {
         try {
           await db.updateServiceOrderStatus(
-            input.orderId,
-            input.newStatus,
-            ctx.user?.id,
-            input.notes
-          );
+  input.orderId,
+  input.newStatus,
+  ctx.user?.id,
+  input.notes,
+  input.dueDate
+);
 
           return {
             success: true,

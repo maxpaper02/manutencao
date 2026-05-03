@@ -67,6 +67,7 @@ export default function Dashboard() {
   const [showStatusDialog, setShowStatusDialog] = useState(false);
   const [newStatus, setNewStatus] = useState<OrderStatus | "">("");
   const [notes, setNotes] = useState("");
+  const [dueDate, setDueDate] = useState("");
   const [showHistoryDialog, setShowHistoryDialog] = useState(false);
   const [selectedOrderIds, setSelectedOrderIds] = useState<number[]>([]);
 
@@ -95,7 +96,8 @@ export default function Dashboard() {
       setShowStatusDialog(false);
       setSelectedOrder(null);
       setNewStatus("");
-      setNotes("");
+setNotes("");
+setDueDate("");
       refetch();
     },
     onError: (error: any) => {
@@ -154,10 +156,11 @@ export default function Dashboard() {
     }
 
     updateStatusMutation.mutate({
-      orderId: selectedOrder.id,
-      newStatus,
-      notes: notes || undefined,
-    });
+  orderId: selectedOrder.id,
+  newStatus,
+  notes: notes || undefined,
+  dueDate: dueDate || undefined,
+});
   };
 
   const handleDeleteOrder = (orderId: number) => {
@@ -431,11 +434,14 @@ export default function Dashboard() {
                         Solicitante
                       </th>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-white">
-                        Data
-                      </th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-white">
-                        Ações
-                      </th>
+  Data
+</th>
+<th className="px-6 py-4 text-left text-sm font-semibold text-white">
+  Prazo
+</th>
+<th className="px-6 py-4 text-left text-sm font-semibold text-white">
+  Ações
+</th>
                     </tr>
                   </thead>
 
@@ -493,52 +499,63 @@ export default function Dashboard() {
                           </Badge>
                         </td>
                         <td className="px-6 py-4 text-sm text-slate-300">
-                          {order.requesterName}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-white">
-                          {new Date(order.createdAt).toLocaleDateString("pt-BR")}
-                        </td>
-                        <td className="px-6 py-4 text-sm">
-                          <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="text-[#D5FFCD] hover:bg-[#347055]"
-                              onClick={() => {
-                                setSelectedOrder(order);
-                                setNewStatus(
-                                  order.status as OrderStatus
-                                );
-                                setNotes("");
-                                setShowStatusDialog(true);
-                              }}
-                            >
-                              Atualizar
-                            </Button>
+  {order.requesterName}
+</td>
 
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="text-[#D5FFCD] hover:bg-[#347055]"
-                              onClick={() => {
-                                setSelectedOrder(order);
-                                setShowHistoryDialog(true);
-                              }}
-                            >
-                              Histórico
-                            </Button>
+<td className="px-6 py-4 text-sm text-white">
+  {new Date(order.createdAt).toLocaleDateString("pt-BR")}
+</td>
 
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="text-[#F28D95] hover:bg-[#F21D2F]/10 hover:text-[#F21D2F]"
-                              onClick={() => handleDeleteOrder(order.id)}
-                              disabled={deleteOrderMutation.isPending}
-                            >
-                              Excluir
-                            </Button>
-                          </div>
-                        </td>
+<td className="px-6 py-4 text-sm text-white">
+  {order.dueDate
+    ? new Date(order.dueDate).toLocaleString("pt-BR")
+    : "Sem prazo"}
+</td>
+
+<td className="px-6 py-4 text-sm">
+  <div className="flex gap-2">
+    <Button
+      size="sm"
+      variant="ghost"
+      className="text-[#D5FFCD] hover:bg-[#347055]"
+      onClick={() => {
+        setSelectedOrder(order);
+        setNewStatus(order.status as OrderStatus);
+        setNotes("");
+        setDueDate(
+          order.dueDate
+            ? new Date(order.dueDate).toISOString().slice(0, 16)
+            : ""
+        );
+        setShowStatusDialog(true);
+      }}
+    >
+      Atualizar
+    </Button>
+
+    <Button
+      size="sm"
+      variant="ghost"
+      className="text-[#D5FFCD] hover:bg-[#347055]"
+      onClick={() => {
+        setSelectedOrder(order);
+        setShowHistoryDialog(true);
+      }}
+    >
+      Histórico
+    </Button>
+
+    <Button
+      size="sm"
+      variant="ghost"
+      className="text-[#F28D95] hover:bg-[#F21D2F]/10 hover:text-[#F21D2F]"
+      onClick={() => handleDeleteOrder(order.id)}
+      disabled={deleteOrderMutation.isPending}
+    >
+      Excluir
+    </Button>
+  </div>
+</td>
                       </tr>
                     ))}
                   </tbody>
@@ -603,47 +620,64 @@ export default function Dashboard() {
                     </span>
                   </div>
 
-                  <p className="text-xs text-slate-400">
-                    Solicitante: {order.requesterName}
-                  </p>
+                  <td className="px-6 py-4 text-sm text-slate-300">
+  {order.requesterName}
+</td>
 
-                  <div className="flex gap-2 pt-2">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="flex-1 text-[#D5FFCD] hover:bg-[#347055] text-xs h-8"
-                      onClick={() => {
-                        setSelectedOrder(order);
-                        setNewStatus(order.status as OrderStatus);
-                        setNotes("");
-                        setShowStatusDialog(true);
-                      }}
-                    >
-                      Atualizar
-                    </Button>
+<td className="px-6 py-4 text-sm text-white">
+  {new Date(order.createdAt).toLocaleDateString("pt-BR")}
+</td>
 
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="flex-1 text-slate-300 hover:bg-slate-700/50 text-xs h-8"
-                      onClick={() => {
-                        setSelectedOrder(order);
-                        setShowHistoryDialog(true);
-                      }}
-                    >
-                      Histórico
-                    </Button>
+<td className="px-6 py-4 text-sm text-white">
+  {order.dueDate
+    ? new Date(order.dueDate).toLocaleString("pt-BR")
+    : "Sem prazo"}
+</td>
 
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="flex-1 text-[#F28D95] hover:bg-[#F21D2F]/10 hover:text-[#F21D2F] text-xs h-8"
-                      onClick={() => handleDeleteOrder(order.id)}
-                      disabled={deleteOrderMutation.isPending}
-                    >
-                      Excluir
-                    </Button>
-                  </div>
+<td className="px-6 py-4 text-sm">
+  <div className="flex gap-2">
+    <Button
+      size="sm"
+      variant="ghost"
+      className="text-[#D5FFCD] hover:bg-[#347055]"
+      onClick={() => {
+        setSelectedOrder(order);
+        setNewStatus(order.status as OrderStatus);
+        setNotes("");
+        setDueDate(
+          order.dueDate
+            ? new Date(order.dueDate).toISOString().slice(0, 16)
+            : ""
+        );
+        setShowStatusDialog(true);
+      }}
+    >
+      Atualizar
+    </Button>
+
+    <Button
+      size="sm"
+      variant="ghost"
+      className="text-[#D5FFCD] hover:bg-[#347055]"
+      onClick={() => {
+        setSelectedOrder(order);
+        setShowHistoryDialog(true);
+      }}
+    >
+      Histórico
+    </Button>
+
+    <Button
+      size="sm"
+      variant="ghost"
+      className="text-[#F28D95] hover:bg-[#F21D2F]/10 hover:text-[#F21D2F]"
+      onClick={() => handleDeleteOrder(order.id)}
+      disabled={deleteOrderMutation.isPending}
+    >
+      Excluir
+    </Button>
+  </div>
+</td>
                 </div>
               </Card>
             ))
@@ -698,7 +732,14 @@ export default function Dashboard() {
         {selectedOrder?.requesterName || "Não informado"}
       </p>
     </div>
-
+<div>
+  <span className="font-semibold text-[#D7E8D1]">Prazo de conclusão:</span>
+  <p className="text-white">
+    {selectedOrder?.dueDate
+      ? new Date(selectedOrder.dueDate).toLocaleString("pt-BR")
+      : "Sem prazo"}
+  </p>
+</div>
     <div className="md:col-span-2">
       <span className="font-semibold text-[#D7E8D1]">Data de abertura:</span>
       <p className="text-white">
@@ -727,6 +768,17 @@ export default function Dashboard() {
         <label className="block text-sm font-semibold text-white mb-2">
           Novo Status *
         </label>
+        <div>
+  <label className="block text-sm font-semibold text-white mb-2">
+    Prazo de conclusão
+  </label>
+  <Input
+    type="datetime-local"
+    value={dueDate}
+    onChange={(e) => setDueDate(e.target.value)}
+    className="bg-[#F4F7F2] border-[#A9C9A0] text-[#0D0D0D] focus-visible:ring-[#66A663] focus-visible:border-[#66A663]"
+  />
+</div>
 
         <Select
           value={newStatus}
