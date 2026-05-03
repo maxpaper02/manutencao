@@ -503,13 +503,13 @@ setDueDate("");
 </td>
 
 <td className="px-6 py-4 text-sm text-white">
-  {new Date(order.createdAt).toLocaleDateString("pt-BR")}
+  {new Date(selectedOrder.dueDate + "T00:00:00").toLocaleDateString("pt-BR")}
 </td>
 
 <td className="px-6 py-4 text-sm text-white">
   {order.dueDate
-    ? new Date(order.dueDate).toLocaleString("pt-BR")
-    : "Sem prazo"}
+  ? new Date(selectedOrder.dueDate + "T00:00:00").toLocaleDateString("pt-BR")
+  : "Sem prazo"}
 </td>
 
 <td className="px-6 py-4 text-sm">
@@ -616,7 +616,7 @@ setDueDate("");
                     </Badge>
 
                     <span className="text-xs text-slate-400">
-                      {new Date(order.createdAt).toLocaleDateString("pt-BR")}
+                      {new Date(selectedOrder.dueDate + "T00:00:00").toLocaleDateString("pt-BR")}
                     </span>
                   </div>
 
@@ -625,13 +625,13 @@ setDueDate("");
 </td>
 
 <td className="px-6 py-4 text-sm text-white">
-  {new Date(order.createdAt).toLocaleDateString("pt-BR")}
+  {new Date(selectedOrder.dueDate + "T00:00:00").toLocaleDateString("pt-BR")}
 </td>
 
 <td className="px-6 py-4 text-sm text-white">
-  {order.dueDate
-    ? new Date(order.dueDate).toLocaleString("pt-BR")
-    : "Sem prazo"}
+  {order?.dueDate
+  ? new Date(order.dueDate + "T00:00:00").toLocaleDateString("pt-BR")
+  : "Sem prazo"}
 </td>
 
 <td className="px-6 py-4 text-sm">
@@ -646,7 +646,7 @@ setDueDate("");
         setNotes("");
         setDueDate(
   order.dueDate
-    ? new Date(order.dueDate).toISOString().slice(0, 10)
+    ? new Date(selectedOrder + "T00:00:00").toLocaleDateString("pt-BR")
     : ""
 );
         setShowStatusDialog(true);
@@ -736,7 +736,7 @@ setDueDate("");
   <span className="font-semibold text-[#D7E8D1]">Prazo de conclusão:</span>
   <p className="text-white">
     {selectedOrder?.dueDate
-      ? new Date(selectedOrder.dueDate).toLocaleString("pt-BR")
+      ? new Date(selectedOrder + "T00:00:00").toLocaleDateString("pt-BR")
       : "Sem prazo"}
   </p>
 </div>
@@ -744,7 +744,7 @@ setDueDate("");
       <span className="font-semibold text-[#D7E8D1]">Data de abertura:</span>
       <p className="text-white">
         {selectedOrder?.createdAt
-          ? new Date(selectedOrder.createdAt).toLocaleString("pt-BR")
+          ? new Date(selectedOrder + "T00:00:00").toLocaleDateString("pt-BR")
           : "Não informado"}
       </p>
     </div>
@@ -904,7 +904,7 @@ setDueDate("");
             <span className="font-semibold text-[#D7E8D1]">Data de abertura:</span>
             <p className="text-white">
               {selectedOrder?.createdAt
-                ? new Date(selectedOrder.createdAt).toLocaleString("pt-BR")
+                ? new Date(selectedOrder + "T00:00:00").toLocaleDateString("pt-BR")
                 : "Não informado"}
             </p>
           </div>
@@ -943,7 +943,7 @@ setDueDate("");
               </div>
 
               <span className="text-xs text-[#D7E8D1] whitespace-nowrap">
-                {new Date(entry.changedAt).toLocaleString("pt-BR")}
+                {new Date(selectedOrder + "T00:00:00").toLocaleDateString("pt-BR")}
               </span>
             </div>
 
