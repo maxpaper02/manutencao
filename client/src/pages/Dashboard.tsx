@@ -664,6 +664,58 @@ export default function Dashboard() {
     </DialogHeader>
 
     <div className="space-y-4">
+      {/* Resumo da solicitação */}
+<div className="bg-[#2F5D50] border border-[#A9C9A0]/40 rounded-lg p-4 space-y-3">
+  <h3 className="text-sm font-bold text-[#D7FFCD] uppercase tracking-wide">
+    Solicitação
+  </h3>
+
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+    <div>
+      <span className="font-semibold text-[#D7E8D1]">Setor / Máquina:</span>
+      <p className="text-white">
+        {selectedOrder?.sector || "Não informado"}
+      </p>
+    </div>
+
+    <div>
+      <span className="font-semibold text-[#D7E8D1]">Tipo de problema:</span>
+      <p className="text-white">
+        {selectedOrder?.problemType || "Não informado"}
+      </p>
+    </div>
+
+    <div>
+      <span className="font-semibold text-[#D7E8D1]">Prioridade:</span>
+      <p className="text-white">
+        {selectedOrder?.priority || "Não informado"}
+      </p>
+    </div>
+
+    <div>
+      <span className="font-semibold text-[#D7E8D1]">Solicitante:</span>
+      <p className="text-white">
+        {selectedOrder?.requesterName || "Não informado"}
+      </p>
+    </div>
+
+    <div className="md:col-span-2">
+      <span className="font-semibold text-[#D7E8D1]">Data de abertura:</span>
+      <p className="text-white">
+        {selectedOrder?.createdAt
+          ? new Date(selectedOrder.createdAt).toLocaleString("pt-BR")
+          : "Não informado"}
+      </p>
+    </div>
+
+    <div className="md:col-span-2">
+      <span className="font-semibold text-[#D7E8D1]">Descrição detalhada:</span>
+      <p className="text-white whitespace-pre-wrap break-words">
+        {selectedOrder?.description || "Não informado"}
+      </p>
+    </div>
+  </div>
+</div>
       <div>
         <label className="block text-sm font-semibold text-white mb-2">
           Status Atual:{" "}
@@ -760,7 +812,60 @@ export default function Dashboard() {
       </DialogTitle>
     </DialogHeader>
 
-    <div className="space-y-4 max-h-96 overflow-y-auto pr-1">
+    <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
+      {/* Resumo da solicitação */}
+      <div className="bg-[#2F5D50] border border-[#A9C9A0]/40 rounded-lg p-4 space-y-3">
+        <h3 className="text-sm font-bold text-[#D7FFCD] uppercase tracking-wide">
+          Solicitação
+        </h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+          <div>
+            <span className="font-semibold text-[#D7E8D1]">Setor / Máquina:</span>
+            <p className="text-white">
+              {selectedOrder?.sector || "Não informado"}
+            </p>
+          </div>
+
+          <div>
+            <span className="font-semibold text-[#D7E8D1]">Tipo de problema:</span>
+            <p className="text-white">
+              {selectedOrder?.problemType || "Não informado"}
+            </p>
+          </div>
+
+          <div>
+            <span className="font-semibold text-[#D7E8D1]">Prioridade:</span>
+            <p className="text-white">
+              {selectedOrder?.priority || "Não informado"}
+            </p>
+          </div>
+
+          <div>
+            <span className="font-semibold text-[#D7E8D1]">Solicitante:</span>
+            <p className="text-white">
+              {selectedOrder?.requesterName || "Não informado"}
+            </p>
+          </div>
+
+          <div className="md:col-span-2">
+            <span className="font-semibold text-[#D7E8D1]">Data de abertura:</span>
+            <p className="text-white">
+              {selectedOrder?.createdAt
+                ? new Date(selectedOrder.createdAt).toLocaleString("pt-BR")
+                : "Não informado"}
+            </p>
+          </div>
+
+          <div className="md:col-span-2">
+            <span className="font-semibold text-[#D7E8D1]">Descrição detalhada:</span>
+            <p className="text-white whitespace-pre-wrap break-words">
+              {selectedOrder?.description || "Não informado"}
+            </p>
+          </div>
+        </div>
+      </div>
+
       {historyLoading ? (
         <div className="flex items-center justify-center py-8">
           <Loader2 className="w-5 h-5 text-[#D7FFCD] animate-spin" />
