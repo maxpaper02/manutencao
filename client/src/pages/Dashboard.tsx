@@ -645,10 +645,10 @@ setDueDate("");
         setNewStatus(order.status as OrderStatus);
         setNotes("");
         setDueDate(
-          order.dueDate
-            ? new Date(order.dueDate).toISOString().slice(0, 16)
-            : ""
-        );
+  order.dueDate
+    ? new Date(order.dueDate).toISOString().slice(0, 10)
+    : ""
+);
         setShowStatusDialog(true);
       }}
     >
@@ -773,7 +773,7 @@ setDueDate("");
     Prazo de conclusão
   </label>
   <Input
-    type="datetime-local"
+    type="date"
     value={dueDate}
     onChange={(e) => setDueDate(e.target.value)}
     className="bg-[#F4F7F2] border-[#A9C9A0] text-[#0D0D0D] focus-visible:ring-[#66A663] focus-visible:border-[#66A663]"
