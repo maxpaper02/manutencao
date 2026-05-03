@@ -11,71 +11,82 @@ export const appRouter = router({
   system: systemRouter,
 
   auth: router({
-    me: publicProcedure.query((opts) => opts.ctx.user),
+  me: publicProcedure.query((opts) => opts.ctx.user),
 
-    logout: publicProcedure.mutation(({ ctx }) => {
-      const cookieOptions = getSessionCookieOptions(ctx.req);
+  logout: publicProcedure.mutation(({ ctx }) => {
+    const cookieOptions = getSessionCookieOptions(ctx.req);
 
-      ctx.res.clearCookie(COOKIE_NAME, {
-        ...cookieOptions,
-        maxAge: -1,
-      });
+    ctx.res.clearCookie(COOKIE_NAME, {
+      ...cookieOptions,
+      maxAge: -1,
+    });
 
-      ctx.res.clearCookie("admin_session", {
+    ctx.res.clearCookie("admin_session", {
+      httpOnly: true,
+      maxAge: -1,
+      sameSite: "lax",
+    });
+
+    return {
+      success: true,
+    } as const;
+  }),
+
+  login: publicProcedure
+    .input(
+      z.object({
+        username: z.string(),
+        password: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const users = [
+        {
+          username: process.env.ADMIN_USER,
+          password: process.env.ADMIN_PASS,
+        },
+        {
+          username: process.env.ADMIN_USER_2,
+          password: process.env.ADMIN_PASS_2,
+        },
+        {
+          username: process.env.ADMIN_USER_3,
+          password: process.env.ADMIN_PASS_3,
+        },
+      ].filter(
+        (user) =>
+          typeof user.username === "string" &&
+          typeof user.password === "string"
+      );
+
+      const matchedUser = users.find(
+        (user) =>
+          user.username === input.username && user.password === input.password
+      );
+
+      console.log("LOGIN INPUT:", input.username);
+      console.log(
+        "LOGIN USERS:",
+        users.map((u) => u.username)
+      );
+      console.log("LOGIN MATCH:", matchedUser?.username ?? "nenhum");
+
+      if (!matchedUser) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Usuário ou senha inválidos",
+        });
+      }
+
+      ctx.res.cookie("admin_session", "authenticated", {
         httpOnly: true,
-        maxAge: -1,
+        maxAge: 1000 * 60 * 60 * 8,
         sameSite: "lax",
       });
 
-      return {
-        success: true,
-      } as const;
+      return { success: true };
     }),
-
-    login: publicProcedure
-      .input(
-        z.object({
-          username: z.string(),
-          password: z.string(),
-        })
-      )
-      .mutation(async ({ input, ctx }) => {
-        const users = [
-  {
-    username: process.env.ADMIN_USER,
-    password: process.env.ADMIN_PASS,
-  },
-  {
-    username: process.env.ADMIN_USER_2,
-    password: process.env.ADMIN_PASS_2,
-  },
-  {
-    username: process.env.ADMIN_USER_3,
-    password: process.env.ADMIN_PASS_3,
-  },
-].filter((user) => user.username && user.password);
-
-const matchedUser = users.find(
-  (user) =>
-    user.username === input.username && user.password === input.password
-);
-
-if (!matchedUser) {
-  throw new TRPCError({
-    code: "UNAUTHORIZED",
-    message: "Usuário ou senha inválidos",
-  });
-}
-
-        ctx.res.cookie("admin_session", "authenticated", {
-          httpOnly: true,
-          maxAge: 1000 * 60 * 60 * 8,
-          sameSite: "lax",
-        });
-
-        return { success: true };
-      }),
-  }),
+}),
 
   orders: router({
     delete: publicProcedure
