@@ -117,6 +117,7 @@ const areaMaquinaOptions = [
   "Tubeteira",
   "Talha Elétrica",
   "Empilhadeira",
+  "Galpão - geral"
 ];
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#4f8f4d] via-[#B4EDA6] to-[#D7FFCD]">
