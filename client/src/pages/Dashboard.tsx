@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { UrgentOrdersModal } from "@/components/dashboard/UrgentOrdersModal";
 import {
   Dialog,
   DialogContent,
@@ -71,11 +72,6 @@ export default function Dashboard() {
   const [showHistoryDialog, setShowHistoryDialog] = useState(false);
   const [selectedOrderIds, setSelectedOrderIds] = useState<number[]>([]);
 
-  if (!loading && !isAuthenticated) {
-    navigate("/login");
-    return null;
-  }
-
   const {
     data: orders = [],
     isLoading: ordersLoading,
@@ -129,15 +125,19 @@ export default function Dashboard() {
   const exportCsvMutation = trpc.orders.exportCsv.useMutation({
     onSuccess: (data: any) => {
       const element = document.createElement("a");
+
       element.setAttribute(
         "href",
         "data:text/csv;charset=utf-8," + encodeURIComponent(data.csv)
       );
+
       element.setAttribute("download", data.filename);
       element.style.display = "none";
+
       document.body.appendChild(element);
       element.click();
       document.body.removeChild(element);
+
       toast.success("Relatório exportado com sucesso!");
     },
     onError: (error: any) => {
@@ -147,6 +147,24 @@ export default function Dashboard() {
 
   const filteredOrders = useMemo(() => {
     return orders;
+  }, [orders]);
+
+  const urgentModalOrders = useMemo(() => {
+    return orders.map((order: any) => ({
+      ...order,
+
+      // Adaptação para o UrgentOrdersModal
+      setor: order.sector,
+      equipment: order.sector,
+      machine: order.sector,
+      description: order.description || order.problemType,
+
+      // Campos principais mantidos
+      priority: order.priority,
+      status: order.status,
+      dueDate: order.dueDate,
+      createdAt: order.createdAt,
+    }));
   }, [orders]);
 
   const formatDateOnly = (value: string | Date | null | undefined) => {
@@ -185,6 +203,7 @@ export default function Dashboard() {
     const confirmed = window.confirm(
       "Tem certeza que deseja excluir esta solicitação?"
     );
+
     if (!confirmed) return;
 
     deleteOrderMutation.mutate({ orderId });
@@ -199,6 +218,7 @@ export default function Dashboard() {
     const confirmed = window.confirm(
       `Tem certeza que deseja excluir ${selectedOrderIds.length} solicitação(ões)?`
     );
+
     if (!confirmed) return;
 
     deleteMultipleOrdersMutation.mutate({
@@ -230,20 +250,29 @@ export default function Dashboard() {
     navigate("/");
   };
 
+  if (!loading && !isAuthenticated) {
+    navigate("/login");
+    return null;
+  }
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-cyan-400 animate-spin" />
+      <div className="min-h-screen bg-gradient-to-br from-[#4f8f4d] via-[#B4EDA6] to-[#D7FFCD] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-[#2F5D50] animate-spin" />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#4f8f4d] via-[#B4EDA6] to-[#D7FFCD]">
-      <header className="border-b border-slate-700/50 backdrop-blur-sm sticky top-0 z-50">
+      <UrgentOrdersModal orders={urgentModalOrders} />
+
+      <header className="border-b border-white/30 backdrop-blur-sm sticky top-0 z-40 bg-[#1A3B2D]/70">
         <div className="container max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white">Painel de Controle</h1>
+            <h1 className="text-2xl font-bold text-white">
+              Painel de Controle
+            </h1>
             <p className="text-sm text-white">Bem-vindo, {user?.name}</p>
           </div>
 
@@ -254,8 +283,8 @@ export default function Dashboard() {
               className="border-[#2F5D50] text-[#2F5D50] bg-white/70 hover:bg-[#2F5D50] hover:text-white"
               onClick={() =>
                 exportCsvMutation.mutate(
-                  filters.status || filters.priority
-                    ? { status: filters.status, priority: filters.priority }
+                  filters.status || filters.priority || filters.search
+                    ? filters
                     : {}
                 )
               }
@@ -282,14 +311,14 @@ export default function Dashboard() {
         <Card className="bg-gradient-to-br from-[#1A3B2D] to-[#347055] border-slate-600 text-white overflow-hidden p-8 backdrop-blur-sm">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="relative">
-              <Search className="absolute left-3 top-3 w-4 h-4 text-white" />
+              <Search className="absolute left-3 top-3 w-4 h-4 text-[#5B665F]" />
               <Input
                 placeholder="Buscar por setor, descrição..."
                 value={filters.search}
                 onChange={(e) =>
                   setFilters({ ...filters, search: e.target.value })
                 }
-                className="bg-white border-[#A9C9A0] text-[#0D0D0D] placeholder:text-[#5B665F] focus-visible:ring-[#66A663] focus-visible:border-[#66A663]"
+                className="pl-9 bg-white border-[#A9C9A0] text-[#0D0D0D] placeholder:text-[#5B665F] focus-visible:ring-[#66A663] focus-visible:border-[#66A663]"
               />
             </div>
 
@@ -310,18 +339,21 @@ export default function Dashboard() {
                 >
                   Todos os Status
                 </SelectItem>
+
                 <SelectItem
                   value="Aberta"
                   className="text-slate-900 data-[highlighted]:bg-[#1A3B2D] data-[highlighted]:text-white"
                 >
                   Aberta
                 </SelectItem>
+
                 <SelectItem
                   value="Em Andamento"
                   className="text-slate-900 data-[highlighted]:bg-[#1A3B2D] data-[highlighted]:text-white"
                 >
                   Em Andamento
                 </SelectItem>
+
                 <SelectItem
                   value="Concluída"
                   className="text-slate-900 data-[highlighted]:bg-[#1A3B2D] data-[highlighted]:text-white"
@@ -351,24 +383,28 @@ export default function Dashboard() {
                 >
                   Todas as Prioridades
                 </SelectItem>
+
                 <SelectItem
                   value="Baixa"
                   className="text-slate-900 data-[highlighted]:bg-[#1A3B2D] data-[highlighted]:text-white"
                 >
                   Baixa
                 </SelectItem>
+
                 <SelectItem
                   value="Média"
                   className="text-slate-900 data-[highlighted]:bg-[#1A3B2D] data-[highlighted]:text-white"
                 >
                   Média
                 </SelectItem>
+
                 <SelectItem
                   value="Alta"
                   className="text-slate-900 data-[highlighted]:bg-[#1A3B2D] data-[highlighted]:text-white"
                 >
                   Alta
                 </SelectItem>
+
                 <SelectItem
                   value="Crítica"
                   className="text-slate-900 data-[highlighted]:bg-[#1A3B2D] data-[highlighted]:text-white"
@@ -406,11 +442,11 @@ export default function Dashboard() {
           <Card className="bg-gradient-to-br from-[#1A3B2D] to-[#347055] border-slate-600 text-white overflow-hidden backdrop-blur-sm">
             {ordersLoading ? (
               <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-6 h-6 text-cyan-400 animate-spin" />
+                <Loader2 className="w-6 h-6 text-[#D7FFCD] animate-spin" />
               </div>
             ) : filteredOrders.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-slate-400">Nenhuma ordem encontrada</p>
+                <p className="text-[#D7E8D1]">Nenhuma ordem encontrada</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -428,30 +464,39 @@ export default function Dashboard() {
                           className="w-4 h-4 accent-[#2F5D50]"
                         />
                       </th>
+
                       <th className="px-6 py-4 text-left text-sm font-semibold text-white">
                         ID
                       </th>
+
                       <th className="px-6 py-4 text-left text-sm font-semibold text-white">
                         Setor/Máquina
                       </th>
+
                       <th className="px-6 py-4 text-left text-sm font-semibold text-white">
                         Problema
                       </th>
+
                       <th className="px-6 py-4 text-left text-sm font-semibold text-white">
                         Prioridade
                       </th>
+
                       <th className="px-6 py-4 text-left text-sm font-semibold text-white">
                         Status
                       </th>
+
                       <th className="px-6 py-4 text-left text-sm font-semibold text-white">
                         Solicitante
                       </th>
+
                       <th className="px-6 py-4 text-left text-sm font-semibold text-white">
                         Data
                       </th>
+
                       <th className="px-6 py-4 text-left text-sm font-semibold text-white">
                         Prazo
                       </th>
+
                       <th className="px-6 py-4 text-left text-sm font-semibold text-white">
                         Ações
                       </th>
@@ -476,12 +521,15 @@ export default function Dashboard() {
                         <td className="px-6 py-4 text-sm text-slate-300">
                           #{order.id}
                         </td>
+
                         <td className="px-6 py-4 text-sm text-white font-medium">
                           {order.sector}
                         </td>
+
                         <td className="px-6 py-4 text-sm text-slate-300 max-w-xs truncate">
                           {order.problemType}
                         </td>
+
                         <td className="px-6 py-4 text-sm">
                           <Badge
                             variant="outline"
@@ -494,6 +542,7 @@ export default function Dashboard() {
                             {order.priority}
                           </Badge>
                         </td>
+
                         <td className="px-6 py-4 text-sm">
                           <Badge
                             variant="outline"
@@ -511,15 +560,19 @@ export default function Dashboard() {
                             {order.status}
                           </Badge>
                         </td>
+
                         <td className="px-6 py-4 text-sm text-slate-300">
                           {order.requesterName}
                         </td>
+
                         <td className="px-6 py-4 text-sm text-white">
                           {formatCreatedAt(order.createdAt)}
                         </td>
+
                         <td className="px-6 py-4 text-sm text-white">
                           {formatDateOnly(order.dueDate)}
                         </td>
+
                         <td className="px-6 py-4 text-sm">
                           <div className="flex gap-2">
                             <Button
@@ -532,7 +585,9 @@ export default function Dashboard() {
                                 setNotes("");
                                 setDueDate(
                                   order?.dueDate
-                                    ? new Date(order.dueDate).toISOString().slice(0, 10)
+                                    ? new Date(order.dueDate)
+                                        .toISOString()
+                                        .slice(0, 10)
                                     : ""
                                 );
                                 setShowStatusDialog(true);
@@ -576,22 +631,24 @@ export default function Dashboard() {
         <div className="md:hidden space-y-4">
           {ordersLoading ? (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-6 h-6 text-cyan-400 animate-spin" />
+              <Loader2 className="w-6 h-6 text-[#2F5D50] animate-spin" />
             </div>
           ) : filteredOrders.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-slate-400">Nenhuma ordem encontrada</p>
+              <p className="text-[#1A3B2D]">Nenhuma ordem encontrada</p>
             </div>
           ) : (
             filteredOrders.map((order: any) => (
               <Card
                 key={order.id}
-                className="bg-slate-800/50 border-slate-700/50 p-4 backdrop-blur-sm"
+                className="bg-[#1A3B2D]/90 border-[#A9C9A0]/50 p-4 backdrop-blur-sm"
               >
                 <div className="space-y-3">
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <p className="text-xs text-slate-400">Ordem #{order.id}</p>
+                      <p className="text-xs text-[#D7E8D1]">
+                        Ordem #{order.id}
+                      </p>
                       <p className="font-semibold text-white text-sm">
                         {order.sector}
                       </p>
@@ -622,16 +679,16 @@ export default function Dashboard() {
                       {order.priority}
                     </Badge>
 
-                    <span className="text-xs text-slate-400">
+                    <span className="text-xs text-[#D7E8D1]">
                       {formatCreatedAt(order.createdAt)}
                     </span>
                   </div>
 
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-[#D7E8D1]">
                     Solicitante: {order.requesterName}
                   </p>
 
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-[#D7E8D1]">
                     Prazo: {formatDateOnly(order.dueDate)}
                   </p>
 
@@ -658,7 +715,7 @@ export default function Dashboard() {
                     <Button
                       size="sm"
                       variant="ghost"
-                      className="flex-1 text-slate-300 hover:bg-slate-700/50 text-xs h-8"
+                      className="flex-1 text-[#D5FFCD] hover:bg-[#347055] text-xs h-8"
                       onClick={() => {
                         setSelectedOrder(order);
                         setShowHistoryDialog(true);
@@ -684,7 +741,6 @@ export default function Dashboard() {
         </div>
       </main>
 
-      {/* Modal Atualizar Status */}
       <Dialog open={showStatusDialog} onOpenChange={setShowStatusDialog}>
         <DialogContent className="bg-[#1F4D3A] border border-[#A9C9A0] shadow-2xl shadow-[#0D0D0D]/25">
           <DialogHeader>
@@ -704,49 +760,63 @@ export default function Dashboard() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                 <div>
-                  <span className="font-semibold text-[#D7E8D1]">Setor / Máquina:</span>
+                  <span className="font-semibold text-[#D7E8D1]">
+                    Setor / Máquina:
+                  </span>
                   <p className="text-white">
                     {selectedOrder?.sector || "Não informado"}
                   </p>
                 </div>
 
                 <div>
-                  <span className="font-semibold text-[#D7E8D1]">Tipo de problema:</span>
+                  <span className="font-semibold text-[#D7E8D1]">
+                    Tipo de problema:
+                  </span>
                   <p className="text-white">
                     {selectedOrder?.problemType || "Não informado"}
                   </p>
                 </div>
 
                 <div>
-                  <span className="font-semibold text-[#D7E8D1]">Prioridade:</span>
+                  <span className="font-semibold text-[#D7E8D1]">
+                    Prioridade:
+                  </span>
                   <p className="text-white">
                     {selectedOrder?.priority || "Não informado"}
                   </p>
                 </div>
 
                 <div>
-                  <span className="font-semibold text-[#D7E8D1]">Solicitante:</span>
+                  <span className="font-semibold text-[#D7E8D1]">
+                    Solicitante:
+                  </span>
                   <p className="text-white">
                     {selectedOrder?.requesterName || "Não informado"}
                   </p>
                 </div>
 
                 <div>
-                  <span className="font-semibold text-[#D7E8D1]">Data de abertura:</span>
+                  <span className="font-semibold text-[#D7E8D1]">
+                    Data de abertura:
+                  </span>
                   <p className="text-white">
                     {formatCreatedAt(selectedOrder?.createdAt)}
                   </p>
                 </div>
 
                 <div>
-                  <span className="font-semibold text-[#D7E8D1]">Prazo de conclusão:</span>
+                  <span className="font-semibold text-[#D7E8D1]">
+                    Prazo de conclusão:
+                  </span>
                   <p className="text-white">
                     {formatDateOnly(selectedOrder?.dueDate)}
                   </p>
                 </div>
 
                 <div className="md:col-span-2">
-                  <span className="font-semibold text-[#D7E8D1]">Descrição detalhada:</span>
+                  <span className="font-semibold text-[#D7E8D1]">
+                    Descrição detalhada:
+                  </span>
                   <p className="text-white whitespace-pre-wrap break-words">
                     {selectedOrder?.description || "Não informado"}
                   </p>
@@ -781,12 +851,14 @@ export default function Dashboard() {
                   >
                     Aberta
                   </SelectItem>
+
                   <SelectItem
                     value="Em Andamento"
                     className="text-[#0D0D0D] data-[highlighted]:bg-[#2F5D50] data-[highlighted]:text-white"
                   >
                     Em Andamento
                   </SelectItem>
+
                   <SelectItem
                     value="Concluída"
                     className="text-[#0D0D0D] data-[highlighted]:bg-[#2F5D50] data-[highlighted]:text-white"
@@ -801,6 +873,7 @@ export default function Dashboard() {
               <label className="block text-sm font-semibold text-white mb-2">
                 Prazo de conclusão
               </label>
+
               <Input
                 type="date"
                 value={dueDate}
@@ -811,8 +884,9 @@ export default function Dashboard() {
 
             <div>
               <label className="block text-sm font-semibold text-white mb-2">
-                Notas (opcional)
+                Notas opcional
               </label>
+
               <Textarea
                 placeholder="Adicione notas sobre esta alteração..."
                 value={notes}
@@ -850,7 +924,6 @@ export default function Dashboard() {
         </DialogContent>
       </Dialog>
 
-      {/* Modal Histórico */}
       <Dialog open={showHistoryDialog} onOpenChange={setShowHistoryDialog}>
         <DialogContent className="bg-[#1F4D3A] border border-[#A9C9A0] shadow-2xl shadow-[#0D0D0D]/25 max-w-2xl">
           <DialogHeader>
@@ -870,49 +943,63 @@ export default function Dashboard() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                 <div>
-                  <span className="font-semibold text-[#D7E8D1]">Setor / Máquina:</span>
+                  <span className="font-semibold text-[#D7E8D1]">
+                    Setor / Máquina:
+                  </span>
                   <p className="text-white">
                     {selectedOrder?.sector || "Não informado"}
                   </p>
                 </div>
 
                 <div>
-                  <span className="font-semibold text-[#D7E8D1]">Tipo de problema:</span>
+                  <span className="font-semibold text-[#D7E8D1]">
+                    Tipo de problema:
+                  </span>
                   <p className="text-white">
                     {selectedOrder?.problemType || "Não informado"}
                   </p>
                 </div>
 
                 <div>
-                  <span className="font-semibold text-[#D7E8D1]">Prioridade:</span>
+                  <span className="font-semibold text-[#D7E8D1]">
+                    Prioridade:
+                  </span>
                   <p className="text-white">
                     {selectedOrder?.priority || "Não informado"}
                   </p>
                 </div>
 
                 <div>
-                  <span className="font-semibold text-[#D7E8D1]">Solicitante:</span>
+                  <span className="font-semibold text-[#D7E8D1]">
+                    Solicitante:
+                  </span>
                   <p className="text-white">
                     {selectedOrder?.requesterName || "Não informado"}
                   </p>
                 </div>
 
                 <div>
-                  <span className="font-semibold text-[#D7E8D1]">Data de abertura:</span>
+                  <span className="font-semibold text-[#D7E8D1]">
+                    Data de abertura:
+                  </span>
                   <p className="text-white">
                     {formatCreatedAt(selectedOrder?.createdAt)}
                   </p>
                 </div>
 
                 <div>
-                  <span className="font-semibold text-[#D7E8D1]">Prazo de conclusão:</span>
+                  <span className="font-semibold text-[#D7E8D1]">
+                    Prazo de conclusão:
+                  </span>
                   <p className="text-white">
                     {formatDateOnly(selectedOrder?.dueDate)}
                   </p>
                 </div>
 
                 <div className="md:col-span-2">
-                  <span className="font-semibold text-[#D7E8D1]">Descrição detalhada:</span>
+                  <span className="font-semibold text-[#D7E8D1]">
+                    Descrição detalhada:
+                  </span>
                   <p className="text-white whitespace-pre-wrap break-words">
                     {selectedOrder?.description || "Não informado"}
                   </p>
@@ -951,7 +1038,9 @@ export default function Dashboard() {
 
                   {entry.notes && (
                     <p className="text-sm text-[#FFFFFF] mt-2">
-                      <span className="font-semibold text-[#D7FFCD]">Notas:</span>{" "}
+                      <span className="font-semibold text-[#D7FFCD]">
+                        Notas:
+                      </span>{" "}
                       {entry.notes}
                     </p>
                   )}
