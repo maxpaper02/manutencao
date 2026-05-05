@@ -147,7 +147,7 @@ sendNewOrderEmail({
   sector: input.sector,
   problemType: input.problemType,
   description: input.description,
-  priority: input.priority,
+  priority: input.priority, 
   requesterName: input.requesterName,
 }).catch((emailError) => {
   console.error("Erro ao enviar e-mail da solicitação:", emailError);
