@@ -143,11 +143,15 @@ export const appRouter = router({
         try {
           await db.createServiceOrder(input);
 
-try {
-  await sendNewOrderEmail(input);
-} catch (emailError) {
+sendNewOrderEmail({
+  sector: input.sector,
+  problemType: input.problemType,
+  description: input.description,
+  priority: input.priority,
+  requesterName: input.requesterName,
+}).catch((emailError) => {
   console.error("Erro ao enviar e-mail da solicitação:", emailError);
-}
+});
 
 return {
   success: true,
