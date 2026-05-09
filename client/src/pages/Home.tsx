@@ -103,79 +103,72 @@ export default function Home() {
       Materiais Didáticos
     </h2>
 
-    <div className="grid grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
 
-      <a
-        href="/manuals/ultra-p500.pdf"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <Button className="w-full h-14 bg-[#F4F7F2] text-[#2F5D50] hover:bg-[#D7FFCD] text-base font-semibold border border-[#A9C9A0]">
-          Manual Ultra P500
-        </Button>
-      </a>
+  <a
+    href="/manuals/ultra-p500.pdf"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="bg-white hover:bg-gray-100 text-[#1A3B2D] font-bold rounded-xl p-4 min-h-[110px] flex items-center justify-center text-center transition-all duration-200 shadow-md"
+  >
+    Manual Ultra P500
+  </a>
 
-      <a
-        href="/manuals/gofrador.pdf"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <Button className="w-full h-14 bg-[#F4F7F2] text-[#2F5D50] hover:bg-[#D7FFCD] text-base font-semibold border border-[#A9C9A0]">
-          Manual Gofrador
-        </Button>
-      </a>
+  <a
+    href="/manuals/gofrador.pdf"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="bg-white hover:bg-gray-100 text-[#1A3B2D] font-bold rounded-xl p-4 min-h-[110px] flex items-center justify-center text-center transition-all duration-200 shadow-md"
+  >
+    Manual Gofrador
+  </a>
 
-      <a
-        href="/manuals/serpa.pdf"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <Button className="w-full h-14 bg-[#F4F7F2] text-[#2F5D50] hover:bg-[#D7FFCD] text-base font-semibold border border-[#A9C9A0]">
-          Manual Cortadeira Serpa
-        </Button>
-      </a>
+  <a
+    href="/manuals/serpa.pdf"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="bg-white hover:bg-gray-100 text-[#1A3B2D] font-bold rounded-xl p-4 min-h-[110px] flex items-center justify-center text-center transition-all duration-200 shadow-md"
+  >
+    Manual Cortadeira Serpa
+  </a>
 
-<a
-        href="/manuals/Tubeteira.pdf"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <Button className="w-full h-14 bg-[#F4F7F2] text-[#2F5D50] hover:bg-[#D7FFCD] text-base font-semibold border border-[#A9C9A0]">
-          Manual Tubeteira DaVinci
-        </Button>
-      </a>
+  <a
+    href="/manuals/Tubeteira.pdf"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="bg-white hover:bg-gray-100 text-[#1A3B2D] font-bold rounded-xl p-4 min-h-[110px] flex items-center justify-center text-center transition-all duration-200 shadow-md"
+  >
+    Manual Tubeteira
+  </a>
 
-      <a
-        href="/manuals/t100.pdf"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <Button className="w-full h-14 bg-[#F4F7F2] text-[#2F5D50] hover:bg-[#D7FFCD] text-base font-semibold border border-[#A9C9A0]">
-          Manual Empacotadeira T100
-        </Button>
-      </a>
+  <a
+    href="/manuals/t100.pdf"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="bg-white hover:bg-gray-100 text-[#1A3B2D] font-bold rounded-xl p-4 min-h-[110px] flex items-center justify-center text-center transition-all duration-200 shadow-md"
+  >
+    Manual Empacotadeira T100
+  </a>
 
-      <a
-        href="/manuals/insuper.pdf"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <Button className="w-full h-14 bg-[#F4F7F2] text-[#2F5D50] hover:bg-[#D7FFCD] text-base font-semibold border border-[#A9C9A0]">
-          Manual Enfardadeira Insuper
-        </Button>
-      </a>
+  <a
+    href="/manuals/insuper.pdf"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="bg-white hover:bg-gray-100 text-[#1A3B2D] font-bold rounded-xl p-4 min-h-[110px] flex items-center justify-center text-center transition-all duration-200 shadow-md"
+  >
+    Manual Enfardadeira Insuper
+  </a>
 
-      <a
-        href="/manuals/T100_falhas.pdf"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <Button className="w-full h-14 bg-[#F4F7F2] text-[#2F5D50] hover:bg-[#D7FFCD] text-base font-semibold border border-[#A9C9A0]">
-          Falhas/Alarmes - T-100
-        </Button>
-      </a>
+  <a
+    href="/manuals/T100_falhas.pdf"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="bg-white hover:bg-gray-100 text-[#1A3B2D] font-bold rounded-xl p-4 min-h-[110px] flex items-center justify-center text-center transition-all duration-200 shadow-md"
+  >
+    Falhas/Alarmes T100
+  </a>
 
-    </div>
+</div>
   </div>
 </Card>
   </div>
