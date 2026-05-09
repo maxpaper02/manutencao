@@ -10,15 +10,19 @@ export async function sendNewOrderEmail(data: {
   console.log("--- INICIANDO ENVIO DE E-MAIL ---");
   console.log("Destinatário:", process.env.EMAIL_TO);
 
-     const transporter = nodemailer.createTransport({
-    host: "74.125.134.108", // <--- Use este número em vez de "smtp.gmail.com"
-    port: 465,
-    secure: true,
+       const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false, // Para a porta 587, isso deve ser false
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
     },
+    tls: {
+      rejectUnauthorized: false // Isso ajuda a passar pelo firewall do Render
+    }
   });
+
 
 
   const html = `
