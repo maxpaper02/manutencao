@@ -143,20 +143,28 @@ export const appRouter = router({
         try {
           await db.createServiceOrder(input);
 
-sendNewOrderEmail({
-  sector: input.sector,
-  problemType: input.problemType,
-  description: input.description,
-  priority: input.priority, 
-  requesterName: input.requesterName,
-}).catch((emailError) => {
-  console.error("Erro ao enviar e-mail da solicitação:", emailError);
-});
+          let emailSent = true;
 
-return {
-  success: true,
-  message: "Solicitação enviada com sucesso!",
-};
+          try {
+            await sendNewOrderEmail({
+              sector: input.sector,
+              problemType: input.problemType,
+              description: input.description,
+              priority: input.priority,
+              requesterName: input.requesterName,
+            });
+          } catch (emailError) {
+            emailSent = false;
+            console.error("Erro ao enviar e-mail da solicitação:", emailError);
+          }
+
+          return {
+            success: true,
+            emailSent,
+            message: emailSent
+              ? "Solicitação enviada com sucesso!"
+              : "Solicitação registrada, mas o e-mail não foi enviado. Verifique as configurações SMTP.",
+          };
         } catch (error) {
           console.error("Error creating service order:", error);
           throw new TRPCError({

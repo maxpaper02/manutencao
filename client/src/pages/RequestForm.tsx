@@ -31,12 +31,20 @@ export default function RequestForm() {
   priority: "",
   requesterName: "",
 });
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted, setSubmitted] = useState<{
+    emailSent: boolean;
+  } | null>(null);
 
   const createOrderMutation = trpc.orders.create.useMutation({
-    onSuccess: () => {
-      toast.success("Solicitação enviada com sucesso!");
-      setSubmitted(true);
+    onSuccess: (result) => {
+      if (result.emailSent === false) {
+        toast.warning(result.message);
+      } else {
+        toast.success(result.message || "Solicitação enviada com sucesso!");
+      }
+      setSubmitted({
+        emailSent: result.emailSent !== false,
+      });
       
     },
     onError: (error) => {
@@ -94,7 +102,9 @@ export default function RequestForm() {
           </div>
           <h2 className="text-2xl font-bold text-white mb-2">Sucesso!</h2>
           <p className="text-slate-300 mb-6">
-            Sua solicitação foi enviada com sucesso. A equipe de manutenção será notificada imediatamente.
+            {submitted.emailSent
+              ? "Sua solicitação foi enviada com sucesso. A equipe de manutenção será notificada imediatamente."
+              : "Sua solicitação foi registrada, mas o e-mail de notificação não foi enviado. Avise a equipe de manutenção e peça para verificar as configurações de e-mail."}
           </p>
           <Button
             className="bg-[#2F5D50] hover:bg-[#264A40] text-white border-0"
