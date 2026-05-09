@@ -1,5 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { getLoginUrl } from "@/const";
 import { ArrowRight, Wrench, BarChart3, Lock } from "lucide-react";
 import logoMaxpaper from "@/assets/Logo-Max-paper.png";
@@ -90,10 +91,93 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+              
             </div>
           </div>
         </div>
       </main>
     </div>
+    <Card className="mt-8 bg-gradient-to-br from-[#1A3B2D] to-[#347055] border-[#A9C9A0] shadow-xl">
+  <div className="p-6">
+    <h2 className="text-xl font-bold text-white mb-6">
+      Materiais Didáticos
+    </h2>
+
+    <div className="grid grid-cols-4 gap-4">
+
+      <a
+        href="/manuals/ultra-p500.pdf"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <Button className="w-full h-14 bg-[#F4F7F2] text-[#2F5D50] hover:bg-[#D7FFCD] text-base font-semibold border border-[#A9C9A0]">
+          Manual Ultra P500
+        </Button>
+      </a>
+
+      <a
+        href="/manuals/gofrador.pdf"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <Button className="w-full h-14 bg-[#F4F7F2] text-[#2F5D50] hover:bg-[#D7FFCD] text-base font-semibold border border-[#A9C9A0]">
+          Manual Gofrador
+        </Button>
+      </a>
+
+      <a
+        href="/manuals/serpa.pdf"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <Button className="w-full h-14 bg-[#F4F7F2] text-[#2F5D50] hover:bg-[#D7FFCD] text-base font-semibold border border-[#A9C9A0]">
+          Manual Cortadeira Serpa
+        </Button>
+      </a>
+
+<a
+        href="/manuals/Tubeteira.pdf"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <Button className="w-full h-14 bg-[#F4F7F2] text-[#2F5D50] hover:bg-[#D7FFCD] text-base font-semibold border border-[#A9C9A0]">
+          Manual Tubeteira DaVinci
+        </Button>
+      </a>
+
+      <a
+        href="/manuals/t100.pdf"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <Button className="w-full h-14 bg-[#F4F7F2] text-[#2F5D50] hover:bg-[#D7FFCD] text-base font-semibold border border-[#A9C9A0]">
+          Manual Empacotadeira T100
+        </Button>
+      </a>
+
+      <a
+        href="/manuals/insuper.pdf"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <Button className="w-full h-14 bg-[#F4F7F2] text-[#2F5D50] hover:bg-[#D7FFCD] text-base font-semibold border border-[#A9C9A0]">
+          Manual Enfardadeira Insuper
+        </Button>
+      </a>
+
+      <a
+        href="/manuals/T100_falhas.pdf"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <Button className="w-full h-14 bg-[#F4F7F2] text-[#2F5D50] hover:bg-[#D7FFCD] text-base font-semibold border border-[#A9C9A0]">
+          Falhas/Alarmes - T-100
+        </Button>
+      </a>
+
+    </div>
   </div>
+</Card>
+  </div>
+
   )}
