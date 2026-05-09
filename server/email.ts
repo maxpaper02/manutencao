@@ -10,15 +10,16 @@ export async function sendNewOrderEmail(data: {
   console.log("--- INICIANDO ENVIO DE E-MAIL ---");
   console.log("Destinatário:", process.env.EMAIL_TO);
 
-   const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465, // Mude de 587 para 465
-    secure: true, // Mude para true
+     const transporter = nodemailer.createTransport({
+    host: "74.125.134.108", // <--- Use este número em vez de "smtp.gmail.com"
+    port: 465,
+    secure: true,
     auth: {
       user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS, // Aquela senha de 16 dígitos
+      pass: process.env.SMTP_PASS,
     },
   });
+
 
   const html = `
       <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
