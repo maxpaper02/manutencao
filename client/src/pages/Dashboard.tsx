@@ -78,9 +78,14 @@ export default function Dashboard() {
     const element = document.getElementById(`order-${orderId}`);
 
     if (element) {
-      element.scrollIntoView({
+      const y =
+        element.getBoundingClientRect().top +
+        window.pageYOffset -
+        120;
+
+      window.scrollTo({
+        top: y,
         behavior: "smooth",
-        block: "center",
       });
 
       setHighlightedOrderId(orderId);
@@ -89,7 +94,7 @@ export default function Dashboard() {
         setHighlightedOrderId(null);
       }, 3000);
     }
-  }, 200);
+  }, 300);
 };
   
   
