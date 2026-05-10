@@ -58,9 +58,17 @@ export async function sendNewOrderEmail(data: NewOrderEmailData) {
       user,
       pass,
     },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 15000,
+
+    tls: {
+      rejectUnauthorized: false,
+    }
+  ,
+
+  
+
+    connectionTimeout: 15000,
+    greetingTimeout: 15000,
+    socketTimeout: 20000,
   });
 
   const safeData: NewOrderEmailData = {
