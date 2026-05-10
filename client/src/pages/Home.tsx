@@ -103,14 +103,14 @@ export default function Home() {
       Materiais Didáticos
     </h2>
 
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-2 mt-8">
 
   <a
     href="/manuals/ultra-p500.pdf"
     target="_blank"
     rel="noopener noreferrer"
-    className="bg-white hover:bg-gray-100 text-[#1A3B2D] font-bold rounded-xl p-4 min-h-[110px] flex items-center justify-center text-center transition-all duration-200 shadow-md"
-  >
+    className="bg-white hover:bg-[#488C46] hover:text-white text-[#1A3B2D] font-bold rounded-xl p-4 min-h-[110px] flex items-center justify-center text-center transition-all duration-200 shadow-md"
+  > {/* border-[#2F5D50] text-[#2F5D50] bg-[#F4F7F2] hover:bg-[#1A3B2D] hover:text-white */}
     Manual Ultra P500
   </a>
 
@@ -118,7 +118,7 @@ export default function Home() {
     href="/manuals/gofrador.pdf"
     target="_blank"
     rel="noopener noreferrer"
-    className="bg-white hover:bg-gray-100 text-[#1A3B2D] font-bold rounded-xl p-4 min-h-[110px] flex items-center justify-center text-center transition-all duration-200 shadow-md"
+    className="bg-white hover:bg-[#488C46] hover:text-white text-[#1A3B2D] font-bold rounded-xl p-4 min-h-[110px] flex items-center justify-center text-center transition-all duration-200 shadow-md"
   >
     Manual Gofrador
   </a>
@@ -127,7 +127,7 @@ export default function Home() {
     href="/manuals/serpa.pdf"
     target="_blank"
     rel="noopener noreferrer"
-    className="bg-white hover:bg-gray-100 text-[#1A3B2D] font-bold rounded-xl p-4 min-h-[110px] flex items-center justify-center text-center transition-all duration-200 shadow-md"
+    className="bg-white hover:bg-[#488C46] hover:text-white text-[#1A3B2D] font-bold rounded-xl p-4 min-h-[110px] flex items-center justify-center text-center transition-all duration-200 shadow-md"
   >
     Manual Cortadeira Serpa
   </a>
@@ -136,7 +136,7 @@ export default function Home() {
     href="/manuals/Tubeteira.pdf"
     target="_blank"
     rel="noopener noreferrer"
-    className="bg-white hover:bg-gray-100 text-[#1A3B2D] font-bold rounded-xl p-4 min-h-[110px] flex items-center justify-center text-center transition-all duration-200 shadow-md"
+    className="bg-white hover:bg-[#488C46] hover:text-white text-[#1A3B2D] font-bold rounded-xl p-4 min-h-[110px] flex items-center justify-center text-center transition-all duration-200 shadow-md"
   >
     Manual Tubeteira
   </a>
@@ -145,7 +145,7 @@ export default function Home() {
     href="/manuals/t100.pdf"
     target="_blank"
     rel="noopener noreferrer"
-    className="bg-white hover:bg-gray-100 text-[#1A3B2D] font-bold rounded-xl p-4 min-h-[110px] flex items-center justify-center text-center transition-all duration-200 shadow-md"
+    className="bg-white hover:bg-[#488C46] hover:text-white text-[#1A3B2D] font-bold rounded-xl p-4 min-h-[110px] flex items-center justify-center text-center transition-all duration-200 shadow-md"
   >
     Manual Empacotadeira T100
   </a>
@@ -154,7 +154,7 @@ export default function Home() {
     href="/manuals/insuper.pdf"
     target="_blank"
     rel="noopener noreferrer"
-    className="bg-white hover:bg-gray-100 text-[#1A3B2D] font-bold rounded-xl p-4 min-h-[110px] flex items-center justify-center text-center transition-all duration-200 shadow-md"
+    className="bg-white hover:bg-[#488C46] hover:text-white text-[#1A3B2D] font-bold rounded-xl p-4 min-h-[110px] flex items-center justify-center text-center transition-all duration-200 shadow-md"
   >
     Manual Enfardadeira Insuper
   </a>
@@ -163,7 +163,7 @@ export default function Home() {
     href="/manuals/T100_falhas.pdf"
     target="_blank"
     rel="noopener noreferrer"
-    className="bg-white hover:bg-gray-100 text-[#1A3B2D] font-bold rounded-xl p-4 min-h-[110px] flex items-center justify-center text-center transition-all duration-200 shadow-md"
+    className="bg-white hover:bg-[#488C46] hover:text-white text-[#1A3B2D] font-bold rounded-xl p-4 min-h-[110px] flex items-center justify-center text-center transition-all duration-200 shadow-md"
   >
     Falhas/Alarmes T100
   </a>
