@@ -71,6 +71,30 @@ export default function Dashboard() {
   const [dueDate, setDueDate] = useState("");
   const [showHistoryDialog, setShowHistoryDialog] = useState(false);
   const [selectedOrderIds, setSelectedOrderIds] = useState<number[]>([]);
+  const [highlightedOrderId, setHighlightedOrderId] = useState<number | null>(null);
+
+const scrollToOrder = (orderId: number) => {
+  setShowStatusDialog(false);
+
+  setTimeout(() => {
+    const element = document.getElementById(`order-${orderId}`);
+
+    if (element) {
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+
+      setHighlightedOrderId(orderId);
+
+      setTimeout(() => {
+        setHighlightedOrderId(null);
+      }, 3000);
+    }
+  }, 200);
+};
+
+  
 
   const {
     data: orders = [],
