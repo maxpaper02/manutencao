@@ -97,6 +97,8 @@ export async function sendNewOrderEmail(data: NewOrderEmailData) {
   `;
 
   try {
+    await transporter.verify();
+console.log("SMTP OK");
     const info = await transporter.sendMail({
       from,
       to,
