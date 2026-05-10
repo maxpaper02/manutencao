@@ -73,9 +73,7 @@ export default function Dashboard() {
   const [selectedOrderIds, setSelectedOrderIds] = useState<number[]>([]);
   const [highlightedOrderId, setHighlightedOrderId] = useState<number | null>(null);
 
-const scrollToOrder = (orderId: number) => {
-  setShowStatusDialog(false);
-
+  const scrollToOrder = (orderId: number) => {
   setTimeout(() => {
     const element = document.getElementById(`order-${orderId}`);
 
@@ -93,7 +91,7 @@ const scrollToOrder = (orderId: number) => {
     }
   }, 200);
 };
-
+  
   
 
   const {
@@ -289,7 +287,10 @@ const scrollToOrder = (orderId: number) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#4f8f4d] via-[#B4EDA6] to-[#D7FFCD]">
-      <UrgentOrdersModal orders={urgentModalOrders} />
+      <UrgentOrdersModal
+  orders={urgentModalOrders}
+  onSelectOrder={scrollToOrder}
+/>
 
       <header className="border-b border-white/30 backdrop-blur-sm sticky top-0 z-40 bg-[#1A3B2D]/70">
         <div className="container max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -530,9 +531,13 @@ const scrollToOrder = (orderId: number) => {
                   <tbody>
                     {filteredOrders.map((order: any) => (
                       <tr
-                        key={order.id}
-                        className="border-b border-slate-700/30 hover:bg-[#1A3B2D] transition-colors"
-                      >
+  id={`order-${order.id}`}
+  className={
+    highlightedOrderId === order.id
+      ? "bg-red-500/20 transition-all duration-500"
+      : ""
+  }
+>
                         <td className="px-4 py-4">
                           <input
                             type="checkbox"

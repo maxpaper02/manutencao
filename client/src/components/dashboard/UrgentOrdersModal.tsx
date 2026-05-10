@@ -4,9 +4,13 @@ import { getDashboardUrgentOrders } from "@/lib/dashboardUrgency";
 
 type Props = {
   orders: any[];
+  onSelectOrder: (id: number) => void;
 };
 
-export function UrgentOrdersModal({ orders }: Props) {
+export function UrgentOrdersModal({
+  orders,
+  onSelectOrder,
+}: Props) {
   const [isOpen, setIsOpen] = useState(true);
 
   const urgentOrders = useMemo(() => {
@@ -19,6 +23,7 @@ export function UrgentOrdersModal({ orders }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-4 backdrop-blur-sm">
       <div className="w-full max-w-4xl overflow-hidden rounded-2xl border border-[#A9C9A0] bg-[#F4F7F2] shadow-2xl">
+        
         <div className="flex items-center justify-between border-b border-[#D7FFCD] bg-gradient-to-r from-[#1A3B2D] via-[#2F5D50] to-[#66A663] px-5 py-4 text-white">
           <div className="flex items-center gap-3">
             <div className="rounded-full bg-white/15 p-2">
@@ -29,6 +34,7 @@ export function UrgentOrdersModal({ orders }: Props) {
               <h2 className="text-lg font-bold">
                 Pendências urgentes da manutenção
               </h2>
+
               <p className="text-sm text-white/85">
                 Prioridade + prazo vencido ou vencendo hoje
               </p>
@@ -52,16 +58,23 @@ export function UrgentOrdersModal({ orders }: Props) {
 
           <div className="space-y-3">
             {urgentOrders.map((order: any) => {
-              const isOverdue = order.urgencyType === "Prazo vencido";
+              const isOverdue =
+                order.urgencyType === "Prazo vencido";
 
               return (
                 <div
                   key={order.id}
-                  className="rounded-xl border border-[#D7FFCD] bg-white p-4 shadow-sm"
+                  onClick={() => {
+                    onSelectOrder(order.id);
+                    setIsOpen(false);
+                  }}
+                  className="cursor-pointer rounded-xl border border-[#D7FFCD] bg-white p-4 transition-all duration-200 hover:scale-[1.01] hover:border-[#2F5D50] hover:shadow-lg"
                 >
                   <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                    
                     <div>
                       <div className="mb-2 flex flex-wrap items-center gap-2">
+                        
                         <span
                           className={`rounded-full px-3 py-1 text-xs font-bold ${
                             order.normalizedPriority === "Crítica"
@@ -88,11 +101,15 @@ export function UrgentOrdersModal({ orders }: Props) {
                       </div>
 
                       <h3 className="font-semibold text-[#1A3B2D]">
-                        {order.equipment || order.machine || "Equipamento não informado"}
+                        {order.equipment ||
+                          order.machine ||
+                          "Equipamento não informado"}
                       </h3>
 
                       <p className="mt-1 text-sm text-[#2F5D50]">
-                        {order.setor ? `Setor: ${order.setor}` : "Setor não informado"}
+                        {order.setor
+                          ? `Setor: ${order.setor}`
+                          : "Setor não informado"}
                       </p>
 
                       {order.description && (
@@ -104,8 +121,11 @@ export function UrgentOrdersModal({ orders }: Props) {
 
                     <div className="rounded-xl bg-[#F4F7F2] px-4 py-3 text-sm text-[#1A3B2D] md:text-right">
                       <p className="font-semibold">Prazo</p>
+
                       <p>
-                        {new Date(order.dueDate).toLocaleDateString("pt-BR")}
+                        {new Date(order.dueDate).toLocaleDateString(
+                          "pt-BR"
+                        )}
                       </p>
                     </div>
                   </div>
