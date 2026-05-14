@@ -8,6 +8,7 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { ArrowLeft, Loader2, CheckCircle } from "lucide-react";
 import LogoMaxpaper from "@/assets/Logo-Max-paper.png";
+
 import {
   Select,
   SelectContent,
@@ -17,78 +18,198 @@ import {
 } from "@/components/ui/select";
 
 export default function RequestForm() {
+
+  // =========================
+  // FOTOS LOCAIS
+  // =========================
+
+  const [fotos, setFotos] = useState<File[]>([]);
+
   const [, navigate] = useLocation();
+
+  // =========================
+  // FORM
+  // =========================
+
   const [formData, setFormData] = useState<{
-  sector: string;
-  problemType: "" | "Elétrico" | "Automação" | "Mecânico" | "Pneumático" | "Limpeza" | "Segurança" | "Outro";
-  description: string;
-  priority: "" | "Baixa" | "Média" | "Alta" | "Crítica";
-  requesterName: string;
-}>({
-  sector: "",
-  problemType: "",
-  description: "",
-  priority: "",
-  requesterName: "",
-});
+    sector: string;
+    problemType:
+      | ""
+      | "Elétrico"
+      | "Automação"
+      | "Mecânico"
+      | "Pneumático"
+      | "Limpeza"
+      | "Segurança"
+      | "Outro";
+
+    description: string;
+
+    priority:
+      | ""
+      | "Baixa"
+      | "Média"
+      | "Alta"
+      | "Crítica";
+
+    requesterName: string;
+  }>({
+    sector: "",
+    problemType: "",
+    description: "",
+    priority: "",
+    requesterName: "",
+  });
+
+  // =========================
+  // SUBMITTED
+  // =========================
+
   const [submitted, setSubmitted] = useState<{
     emailSent: boolean;
   } | null>(null);
 
-  const createOrderMutation = trpc.orders.create.useMutation({
-    onSuccess: (result) => {
-      if (result.emailSent === false) {
-        toast.warning(result.message);
-      } else {
-        toast.success(result.message || "Solicitação enviada com sucesso!");
+  // =========================
+  // MUTATION
+  // =========================
+
+  const createOrderMutation =
+    trpc.orders.create.useMutation({
+
+      onSuccess: (result) => {
+
+        if (result.emailSent === false) {
+          toast.warning(result.message);
+        } else {
+          toast.success(
+            result.message ||
+              "Solicitação enviada com sucesso!"
+          );
+        }
+
+        setSubmitted({
+          emailSent: result.emailSent !== false,
+        });
+      },
+
+      onError: (error) => {
+
+        console.error(
+          "ERRO AO CRIAR SOLICITAÇÃO:",
+          error
+        );
+
+        toast.error(
+          `Erro ao enviar solicitação: ${error.message}`
+        );
+      },
+    });
+
+  // =========================
+  // SUBMIT
+  // =========================
+
+  const handleSubmit = async (
+    e: React.FormEvent
+  ) => {
+
+    e.preventDefault();
+
+    if (!formData.sector) {
+      toast.error("Selecione o equipamento.");
+      return;
+    }
+
+    if (!formData.problemType) {
+      toast.error("Selecione o tipo de problema.");
+      return;
+    }
+
+    if (!formData.description.trim()) {
+      toast.error("Descreva o problema.");
+      return;
+    }
+
+    if (!formData.priority) {
+      toast.error("Selecione o nível de urgência.");
+      return;
+    }
+
+    if (!formData.requesterName.trim()) {
+      toast.error("Informe o nome do solicitante.");
+      return;
+    }
+
+    try {
+
+      // =========================
+      // CAMINHOS DAS FOTOS
+      // =========================
+
+      let photos: string[] = [];
+
+      // =========================
+      // UPLOAD
+      // =========================
+
+      if (fotos.length > 0) {
+
+        const form = new FormData();
+
+        fotos.forEach((foto) => {
+          form.append("fotos", foto);
+        });
+
+        const uploadResponse =
+          await fetch(
+            "http://localhost:3000/api/upload",
+            {
+              method: "POST",
+              body: form,
+            }
+          );
+
+        const uploadData =
+          await uploadResponse.json();
+
+        photos = uploadData.arquivos.map(
+          (arquivo: any) =>
+            `/uploads/${arquivo.filename}`
+        );
       }
-      setSubmitted({
-        emailSent: result.emailSent !== false,
+
+      // =========================
+      // CREATE ORDER
+      // =========================
+
+      createOrderMutation.mutate({
+
+        sector: formData.sector,
+
+        problemType:
+          formData.problemType,
+
+        description:
+          formData.description,
+
+        priority:
+          formData.priority,
+
+        requesterName:
+          formData.requesterName,
+
+        photos,
       });
-      
-    },
-    onError: (error) => {
-  console.error("ERRO AO CRIAR SOLICITAÇÃO:", error);
-  toast.error(`Erro ao enviar solicitação: ${error.message}`);
-},
-  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-  e.preventDefault();
+    } catch (error) {
 
-  if (!formData.sector) {
-    toast.error("Selecione o equipamento.");
-    return;
-  }
+      console.error(error);
 
-  if (!formData.problemType) {
-    toast.error("Selecione o tipo de problema.");
-    return;
-  }
-
-  if (!formData.description.trim()) {
-    toast.error("Descreva o problema.");
-    return;
-  }
-
-  if (!formData.priority) {
-    toast.error("Selecione o nível de urgência.");
-    return;
-  }
-
-  if (!formData.requesterName.trim()) {
-    toast.error("Informe o nome do solicitante.");
-    return;
-  }
-
-  createOrderMutation.mutate({
-    sector: formData.sector,
-    problemType: formData.problemType,
-    description: formData.description,
-    priority: formData.priority,
-    requesterName: formData.requesterName,
-  });
-};
+      toast.error(
+        "Erro ao enviar solicitação"
+      );
+    }
+  };
 
   if (submitted) {
     return (
@@ -129,6 +250,7 @@ const areaMaquinaOptions = [
   "Empilhadeira",
   "Galpão - geral"
 ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#4f8f4d] via-[#B4EDA6] to-[#D7FFCD]">
       {/* Header */}
@@ -232,6 +354,63 @@ const areaMaquinaOptions = [
                 <p className="text-xs text-slate-400 mt-1">
                   Mínimo 10 caracteres
                 </p>
+                <div className="mt-4">
+  <label
+    className="
+      inline-flex
+      items-center
+      justify-center
+      py-2
+      px-4
+      rounded-lg
+      font-semibold
+      text-sm
+      transition-all
+      border
+      cursor-pointer
+      bg-white
+      text-[#2F5D50]
+      border-[#A9C9A0]
+      hover:bg-[#B6D9AD]
+    "
+  >
+    Anexar Fotos
+
+    <input
+      type="file"
+      accept="image/*"
+      multiple
+      hidden
+      onChange={(e) => {
+        const arquivos = Array.from(e.target.files || []);
+
+        if (arquivos.length > 3) {
+          toast.error("Máximo de 3 fotos.");
+          return;
+        }
+
+        setFotos(arquivos);
+      }}
+    />
+  </label>
+
+  {fotos.length > 0 && (
+    <div className="mt-3 space-y-1">
+      <p className="text-sm text-slate-300">
+        {fotos.length} foto(s) selecionada(s)
+      </p>
+
+      {fotos.map((foto, index) => (
+        <div
+          key={index}
+          className="text-xs text-slate-400 truncate"
+        >
+          • {foto.name}
+        </div>
+      ))}
+    </div>
+  )}
+</div>
               </div>
 
               {/* Prioridade */}

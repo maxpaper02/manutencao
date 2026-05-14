@@ -7,6 +7,8 @@ import { z } from "zod";
 import * as db from "./db";
 import { sendNewOrderEmail } from "./email";
 
+
+
 export const appRouter = router({
   system: systemRouter,
 
@@ -137,6 +139,7 @@ export const appRouter = router({
             .min(10, "Descrição deve ter pelo menos 10 caracteres"),
           priority: z.enum(["Baixa", "Média", "Alta", "Crítica"]),
           requesterName: z.string().min(1, "Nome do solicitante é obrigatório"),
+          photos: z.array(z.string()).optional(),
         })
       )
       .mutation(async ({ input }) => {

@@ -109,14 +109,33 @@ export async function createServiceOrder(data: {
   description: string;
   priority: "Baixa" | "Média" | "Alta" | "Crítica";
   requesterName: string;
+  photos?: string[];
 }) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
 
-  const result = await db.insert(serviceOrders).values({
-    ...data,
-    status: "Aberta",
-  });
+  const db = await getDb();
+
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db
+    .insert(serviceOrders)
+    .values({
+
+      sector: data.sector,
+
+      problemType: data.problemType,
+
+      description: data.description,
+
+      priority: data.priority,
+
+      requesterName: data.requesterName,
+
+      status: "Aberta",
+
+      photos: JSON.stringify(data.photos || []),
+    });
 
   return result;
 }
@@ -152,10 +171,31 @@ export async function getServiceOrders(filters?: {
   const query = db.select().from(serviceOrders);
 
   if (conditions.length > 0) {
-    return await query.where(and(...conditions)).orderBy(desc(serviceOrders.createdAt));
+    const orders = await query
+  .where(and(...conditions))
+  .orderBy(desc(serviceOrders.createdAt));
+
+return orders.map((order) => ({
+  ...order,
+
+  photos: order.photos
+    ? JSON.parse(order.photos)
+    : [],
+}));
   }
 
-  return await query.orderBy(desc(serviceOrders.createdAt));
+  const orders =
+  await query.orderBy(
+    desc(serviceOrders.createdAt)
+  );
+
+return orders.map((order) => ({
+  ...order,
+
+  photos: order.photos
+    ? JSON.parse(order.photos)
+    : [],
+}));
 }
 
 export async function getServiceOrderById(id: number) {
@@ -168,7 +208,17 @@ export async function getServiceOrderById(id: number) {
     .where(eq(serviceOrders.id, id))
     .limit(1);
 
-  return result.length > 0 ? result[0] : null;
+  if (result.length === 0) {
+  return null;
+}
+
+return {
+  ...result[0],
+
+  photos: result[0].photos
+    ? JSON.parse(result[0].photos)
+    : [],
+};
 }
 
 export async function updateServiceOrderStatus(

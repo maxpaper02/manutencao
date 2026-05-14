@@ -32,6 +32,9 @@ import {
   CheckCircle2,
   Loader2,
 } from "lucide-react";
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
+import logoMaxpaper from "/excel/Logo-Max-paper.png";
 
 const PRIORITY_COLORS = {
   Baixa: "bg-blue-500/20 text-blue-300 border-blue-500/30",
@@ -149,28 +152,226 @@ export default function Dashboard() {
     },
   });
 
-  const exportCsvMutation = trpc.orders.exportCsv.useMutation({
-    onSuccess: (data: any) => {
-      const element = document.createElement("a");
+  const exportExcel = async () => {
+  try {
+    const workbook = new ExcelJS.Workbook();
 
-      element.setAttribute(
-        "href",
-        "data:text/csv;charset=utf-8," + encodeURIComponent(data.csv)
-      );
+    const worksheet = workbook.addWorksheet("Solicitações");
 
-      element.setAttribute("download", data.filename);
-      element.style.display = "none";
+    // =========================
+    // COLUNAS
+    // =========================
 
-      document.body.appendChild(element);
-      element.click();
-      document.body.removeChild(element);
+    worksheet.columns = [
+      { header: "ID", key: "id", width: 8 },
+      { header: "Setor/Máquina", key: "sector", width: 20 },
+      { header: "Problema", key: "problemType", width: 20 },
+      { header: "Descrição", key: "description", width: 40 },
+      { header: "Prioridade", key: "priority", width: 10 },
+      { header: "Status", key: "status", width: 12 },
+      { header: "Solicitante", key: "requesterName", width: 20 },
+      { header: "Data Abertura", key: "createdAt", width: 16 },
+      { header: "Prazo", key: "dueDate", width: 16 },
 
-      toast.success("Relatório exportado com sucesso!");
-    },
-    onError: (error: any) => {
-      toast.error(error.message || "Erro ao exportar relatório");
-    },
-  });
+    ];
+
+    // =========================
+    // LOGO
+    // =========================
+
+    const response = await fetch(logoMaxpaper);
+
+    const blob = await response.blob();
+
+    const arrayBuffer = await blob.arrayBuffer();
+
+    const logoId = workbook.addImage({
+      buffer: arrayBuffer,
+      extension: "png",
+    });
+
+    // =========================
+    // LINHA 1
+    // =========================
+
+    worksheet.mergeCells("A1:B1");
+
+    worksheet.getRow(1).height = 85;
+
+    // Fundo verde linha 1
+    for (let col = 1; col <= 9; col++) {
+  const cell = worksheet.getCell(1, col);
+
+  cell.fill = {
+    type: "pattern",
+    pattern: "solid",
+    fgColor: { argb: "FFFFFFFF" },
+  };
+
+  cell.alignment = {
+    vertical: "middle",
+    horizontal: "center",
+  };
+}
+
+    // Logo
+    worksheet.addImage(logoId, {
+  tl: { col: 0.15, row: 0.15 } as any,
+  ext: { width: 84, height: 84 },
+} as any);
+
+
+    // Título
+    worksheet.mergeCells("C1:I1");
+
+    const titleCell = worksheet.getCell("C1");
+
+    titleCell.value = "RELATÓRIO DE MANUTENÇÃO";
+
+    titleCell.font = {
+      bold: true,
+      size: 28,
+      color: { argb: "FF488C46" },
+      name: "Arial",
+    };
+
+    titleCell.alignment = {
+      vertical: "middle",
+      horizontal: "center",
+    };
+
+    // =========================
+    // CABEÇALHO
+    // =========================
+
+    const headerRow = worksheet.getRow(2);
+
+    headerRow.values = [
+      "ID",
+      "Setor/Máquina",
+      "Problema",
+      "Descrição",
+      "Prioridade",
+      "Status",
+      "Solicitante",
+      "Data Abertura",
+      "Prazo",
+    ];
+
+    headerRow.height = 30;
+
+    headerRow.eachCell((cell) => {
+      cell.font = {
+        bold: true,
+        color: { argb: "FFFFFFFF" },
+      };
+
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FF488C46" },
+      };
+
+      cell.alignment = {
+        horizontal: "center",
+        vertical: "middle",
+        wrapText: true,
+      };
+
+      cell.border = {
+        top: { style: "thin" },
+        left: { style: "thin" },
+        bottom: { style: "thin" },
+        right: { style: "thin" },
+      };
+    });
+
+    // =========================
+    // DADOS
+    // =========================
+
+    filteredOrders.forEach((order: any) => {
+      worksheet.addRow({
+        id: order.id,
+        sector: order.sector,
+        problemType: order.problemType,
+        description: order.description || "",
+        priority: order.priority,
+        status: order.status,
+        requesterName: order.requesterName,
+        createdAt: formatCreatedAt(order.createdAt),
+        dueDate: formatDateOnly(order.dueDate),
+      });
+    });
+
+    // =========================
+    // ESTILO GERAL
+    // =========================
+
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber >= 3) {
+        row.eachCell((cell) => {
+          cell.alignment = {
+            wrapText: true,
+            vertical: "top",
+            horizontal: "left",
+          };
+
+          cell.border = {
+            top: { style: "thin", color: { argb: "FFD9D9D9" } },
+            left: { style: "thin", color: { argb: "FFD9D9D9" } },
+            bottom: { style: "thin", color: { argb: "FFD9D9D9" } },
+            right: { style: "thin", color: { argb: "FFD9D9D9" } },
+          };
+        });
+      }
+    });
+
+    // =========================
+    // AUTO FILTRO
+    // =========================
+
+    worksheet.autoFilter = {
+      from: "A2",
+      to: "I2",
+    };
+
+    // =========================
+    // CONGELAR PAINEL
+    // =========================
+
+    worksheet.views = [
+      {
+        state: "frozen",
+        ySplit: 2,
+      },
+    ];
+
+    // =========================
+    // EXPORTAÇÃO
+    // =========================
+
+    const buffer = await workbook.xlsx.writeBuffer();
+
+    const blobExport = new Blob([buffer], {
+      type:
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
+    saveAs(
+      blobExport,
+      `Relatorio_Manutencao_MaxPaper_${new Date()
+        .toISOString()
+        .slice(0, 10)}.xlsx`
+    );
+
+    toast.success("Relatório Excel exportado com sucesso!");
+  } catch (error) {
+    console.error(error);
+
+    toast.error("Erro ao exportar relatório");
+  }
+};
 
   const filteredOrders = useMemo(() => {
     return orders;
@@ -311,17 +512,10 @@ export default function Dashboard() {
               variant="outline"
               size="sm"
               className="border-[#2F5D50] text-[#2F5D50] bg-white/70 hover:bg-[#2F5D50] hover:text-white"
-              onClick={() =>
-                exportCsvMutation.mutate(
-                  filters.status || filters.priority || filters.search
-                    ? filters
-                    : {}
-                )
-              }
-              disabled={exportCsvMutation.isPending}
+              onClick={exportExcel}
             >
               <Download className="w-4 h-4 mr-2" />
-              Exportar CSV
+              Exportar Relatório
             </Button>
 
             <Button
@@ -858,6 +1052,34 @@ export default function Dashboard() {
               </div>
             </div>
 
+            {selectedOrder?.photos?.length > 0 && (
+  <div className="md:col-span-2">
+    <span className="font-semibold text-[#D7E8D1] block mb-2">
+      Fotos anexadas:
+    </span>
+
+    <div className="flex flex-wrap gap-3">
+      {(Array.isArray(selectedOrder.photos)
+  ? selectedOrder.photos
+  : []
+).map((photo: string, index: number) => (
+        <a
+          key={index}
+          href={`http://localhost:3000${photo}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <img
+            src={`http://localhost:3000${photo}`}
+            alt={`Foto ${index + 1}`}
+            className="w-28 h-28 object-cover rounded-lg border border-[#A9C9A0] hover:scale-105 transition"
+          />
+        </a>
+      ))}
+    </div>
+  </div>
+)}
+
             <div>
               <label className="block text-sm font-semibold text-white mb-2">
                 Status Atual:{" "}
@@ -1038,6 +1260,34 @@ export default function Dashboard() {
                     {selectedOrder?.description || "Não informado"}
                   </p>
                 </div>
+{selectedOrder?.photos?.length > 0 && (
+  <div className="md:col-span-2">
+    <span className="font-semibold text-[#D7E8D1] block mb-2">
+      Fotos anexadas:
+    </span>
+
+    <div className="flex flex-wrap gap-3">
+      {(Array.isArray(selectedOrder.photos)
+  ? selectedOrder.photos
+  : []
+).map((photo: string, index: number) => (
+        <a
+          key={index}
+          href={`http://localhost:3000${photo}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <img
+            src={`http://localhost:3000${photo}`}
+            alt={`Foto ${index + 1}`}
+            className="w-28 h-28 object-cover rounded-lg border border-[#A9C9A0] hover:scale-105 transition"
+          />
+        </a>
+      ))}
+    </div>
+  </div>
+)}
+                
               </div>
             </div>
 

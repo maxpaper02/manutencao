@@ -20,6 +20,7 @@ export const users = mysqlTable("users", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
+  
 });
 
 export type User = typeof users.$inferSelect;
@@ -37,6 +38,7 @@ export const serviceOrders = mysqlTable("serviceOrders", {
   priority: mysqlEnum("priority", ["Baixa", "Média", "Alta", "Crítica"]).notNull(), // Prioridade
   status: mysqlEnum("status", ["Aberta", "Em Andamento", "Concluída"]).default("Aberta").notNull(), // Status
   requesterName: varchar("requesterName", { length: 255 }).notNull(), // Nome do solicitante
+  photos: text("photos").default("[]"),
   assignedTo: int("assignedTo"), // ID do usuário responsável (FK para users)
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
