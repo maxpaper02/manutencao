@@ -161,8 +161,7 @@ export default function RequestForm() {
         });
 
         const uploadResponse =
-          await fetch(
-            "http://localhost:3000/api/upload",
+          await fetch("/api/upload",
             {
               method: "POST",
               body: form,

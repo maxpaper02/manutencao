@@ -1065,12 +1065,12 @@ export default function Dashboard() {
 ).map((photo: string, index: number) => (
         <a
           key={index}
-          href={`http://localhost:3000${photo}`}
+          href={photo}
           target="_blank"
           rel="noopener noreferrer"
         >
           <img
-            src={`http://localhost:3000${photo}`}
+            src={photo}
             alt={`Foto ${index + 1}`}
             className="w-28 h-28 object-cover rounded-lg border border-[#A9C9A0] hover:scale-105 transition"
           />
@@ -1273,12 +1273,12 @@ export default function Dashboard() {
 ).map((photo: string, index: number) => (
         <a
           key={index}
-          href={`http://localhost:3000${photo}`}
+          href={photo}
           target="_blank"
           rel="noopener noreferrer"
         >
           <img
-            src={`http://localhost:3000${photo}`}
+            src={photo}
             alt={`Foto ${index + 1}`}
             className="w-28 h-28 object-cover rounded-lg border border-[#A9C9A0] hover:scale-105 transition"
           />
