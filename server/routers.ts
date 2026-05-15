@@ -155,6 +155,7 @@ export const appRouter = router({
               description: input.description,
               priority: input.priority,
               requesterName: input.requesterName,
+              photos: input.photos,
             });
           } catch (emailError) {
             emailSent = false;

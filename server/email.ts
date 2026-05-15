@@ -8,6 +8,7 @@ type NewOrderEmailData = {
   description: string;
   priority: string;
   requesterName: string;
+  photos?: string[];
 };
 
 export async function sendNewOrderEmail(
@@ -32,6 +33,19 @@ export async function sendNewOrderEmail(
         <p><strong>Solicitante:</strong> ${data.requesterName}</p>
 
         <p><strong>Descrição:</strong></p>
+
+         <h3>Fotos anexadas:</h3>
+
+      ${
+        data.photos?.map((foto: string) => `
+      <div style="margin-bottom:10px;">
+        <img 
+          src="${foto}" 
+          style="max-width:300px;border-radius:8px;"
+        />
+      </div>
+    `).join("") || "<p>Sem fotos</p>"
+  }
 
         <div style="padding:12px;background:#f3f4f6;border-radius:8px;">
           ${data.description}
