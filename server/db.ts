@@ -7,14 +7,23 @@ import {
   statusHistory,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
+import mysql from "mysql2";
 
-let _db: ReturnType<typeof drizzle> | null = null;
-
+let _db: any = null;
 // Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
-      _db = drizzle(process.env.DATABASE_URL);
+    
+
+const pool = mysql.createPool({
+  uri: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
+}).promise();
+
+_db = drizzle(pool);
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
       _db = null;
@@ -175,7 +184,7 @@ export async function getServiceOrders(filters?: {
   .where(and(...conditions))
   .orderBy(desc(serviceOrders.createdAt));
 
-return orders.map((order) => ({
+return orders.map((order: any) => ({
   ...order,
 
   photos: order.photos
@@ -189,7 +198,7 @@ return orders.map((order) => ({
     desc(serviceOrders.createdAt)
   );
 
-return orders.map((order) => ({
+return orders.map((order: any) => ({
   ...order,
 
   photos: order.photos

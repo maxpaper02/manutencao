@@ -306,7 +306,7 @@ export const appRouter = router({
             "Data Criação",
           ];
 
-          const rows = orders.map((order) => [
+          const rows = orders.map((order: any) => [
             order.id,
             order.sector,
             order.problemType,
@@ -319,7 +319,7 @@ export const appRouter = router({
 
           const csv = [
             headers.join(","),
-            ...rows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
+            ...rows.map((row: any) => row.map((cell: any) => `"${cell}"`).join(",")),
           ].join("\n");
 
           return {
