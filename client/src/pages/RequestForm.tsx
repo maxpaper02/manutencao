@@ -172,9 +172,8 @@ export default function RequestForm() {
           await uploadResponse.json();
 
         photos = uploadData.arquivos.map(
-          (arquivo: any) =>
-            `/uploads/${arquivo.filename}`
-        );
+  (arquivo: any) => arquivo.path
+);
       }
 
       // =========================

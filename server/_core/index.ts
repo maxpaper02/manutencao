@@ -10,19 +10,21 @@ import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import multer from "multer";
 import path from "path";
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
 
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-
-  filename: (req, file, cb) => {
-    const nome =
-      Date.now() + path.extname(file.originalname);
-
-    cb(null, nome);
-  },
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: async (req, file) => ({
+    folder: "maxpaper-manutencao",
+    allowed_formats: ["jpg", "jpeg", "png", "webp"],
+  }),
 });
 
 
@@ -61,7 +63,7 @@ async function startServer() {
   upload.array("fotos", 3),
   (req, res) => {
 
-    const arquivos = req.files;
+    const arquivos = req.files as Express.Multer.File[];
 
     res.json({
       success: true,
