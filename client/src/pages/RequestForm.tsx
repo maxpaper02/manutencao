@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { ArrowLeft, Loader2, CheckCircle } from "lucide-react";
+import { ArrowLeft, Loader2, CheckCircle, UploadCloud } from "lucide-react";
 import LogoMaxpaper from "@/assets/Logo-Max-paper.png";
 
 import {
@@ -170,7 +170,7 @@ export default function RequestForm() {
 
         const uploadData =
           await uploadResponse.json();
-
+          console.log(uploadData);
         photos = uploadData.arquivos.map(
   (arquivo: any) => arquivo.path
 );
@@ -196,7 +196,7 @@ export default function RequestForm() {
         requesterName:
           formData.requesterName,
 
-        photos,
+        photos
       });
 
     } catch (error) {
