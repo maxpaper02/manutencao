@@ -970,8 +970,7 @@ export default function Dashboard() {
       </main>
 
       <Dialog open={showStatusDialog} onOpenChange={setShowStatusDialog}>
-        <DialogContent className="bg-[#1F4D3A] border border-[#A9C9A0] shadow-2xl shadow-[#0D0D0D]/25">
-          <DialogHeader>
+          <DialogContent className="bg-[#1F4D3A] border border-[#A9C9A0] shadow-2xl shadow-[#0D0D0D]/25 max-h-[90vh] overflow-y-auto">          <DialogHeader>
             <DialogTitle className="text-[#FFFFFF]">
               Status -{" "}
               {selectedOrder?.sector ||
